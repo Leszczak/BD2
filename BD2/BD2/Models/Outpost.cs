@@ -7,5 +7,8 @@ namespace BD2.Models
 {
     public class Outpost
     {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public string Location { get; set; }
     }
 }
