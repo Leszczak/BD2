@@ -29,15 +29,23 @@ namespace BD2
         {
             services.AddControllers();
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DataContext")));
+                options.UseSqlServer(Configuration["ConnectionString"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json",
+                             optional: false,
+                             reloadOnChange: true)
+                .AddEnvironmentVariables();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                builder.AddUserSecrets<Startup>();
             }
 
             app.UseHttpsRedirection();
