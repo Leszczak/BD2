@@ -1,0 +1,110 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using BD2.Data;
+using BD2.Models;
+
+namespace BD2.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GlobalAtributesController : ControllerBase
+    {
+        private readonly DataContext _context;
+
+        public GlobalAtributesController(DataContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/GlobalAtributes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GlobalAtribute>>> GetGlobalAtributes()
+        {
+            return await _context.GlobalAtributes.ToListAsync();
+        }
+
+        // GET: api/GlobalAtributes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GlobalAtribute>> GetGlobalAtribute(long id)
+        {
+            var globalAtribute = await _context.GlobalAtributes.FindAsync(id);
+
+            if (globalAtribute == null)
+            {
+                return NotFound();
+            }
+
+            return globalAtribute;
+        }
+
+        // PUT: api/GlobalAtributes/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutGlobalAtribute(long id, GlobalAtribute globalAtribute)
+        {
+            if (id != globalAtribute.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(globalAtribute).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!GlobalAtributeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/GlobalAtributes
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost]
+        public async Task<ActionResult<GlobalAtribute>> PostGlobalAtribute(GlobalAtribute globalAtribute)
+        {
+            _context.GlobalAtributes.Add(globalAtribute);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetGlobalAtribute", new { id = globalAtribute.Id }, globalAtribute);
+        }
+
+        // DELETE: api/GlobalAtributes/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<GlobalAtribute>> DeleteGlobalAtribute(long id)
+        {
+            var globalAtribute = await _context.GlobalAtributes.FindAsync(id);
+            if (globalAtribute == null)
+            {
+                return NotFound();
+            }
+
+            _context.GlobalAtributes.Remove(globalAtribute);
+            await _context.SaveChangesAsync();
+
+            return globalAtribute;
+        }
+
+        private bool GlobalAtributeExists(long id)
+        {
+            return _context.GlobalAtributes.Any(e => e.Id == id);
+        }
+    }
+}
