@@ -4,14 +4,16 @@ using BD2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BD2.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20191208123357_ReferenceUpdate")]
+    partial class ReferenceUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,8 +133,17 @@ namespace BD2.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<long?>("AtributeId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("GlobalAtributeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("GroupId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -142,54 +153,15 @@ namespace BD2.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PhotoId");
-
-                    b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemAtribute", b =>
-                {
-                    b.Property<long>("ItemId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("AtributeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ItemId", "AtributeId");
-
                     b.HasIndex("AtributeId");
-
-                    b.ToTable("ItemAtributes");
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemGlobalAtribute", b =>
-                {
-                    b.Property<long>("ItemId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GlobalAtributeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ItemId", "GlobalAtributeId");
 
                     b.HasIndex("GlobalAtributeId");
 
-                    b.ToTable("ItemGlobalAtributes");
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemGroup", b =>
-                {
-                    b.Property<long>("ItemId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GroupId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ItemId", "GroupId");
-
                     b.HasIndex("GroupId");
 
-                    b.ToTable("ItemGroups");
+                    b.HasIndex("PhotoId");
+
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("BD2.Models.LocalItem", b =>
@@ -329,54 +301,21 @@ namespace BD2.Migrations
 
             modelBuilder.Entity("BD2.Models.Item", b =>
                 {
+                    b.HasOne("BD2.Models.Atribute", null)
+                        .WithMany("Items")
+                        .HasForeignKey("AtributeId");
+
+                    b.HasOne("BD2.Models.GlobalAtribute", null)
+                        .WithMany("Items")
+                        .HasForeignKey("GlobalAtributeId");
+
+                    b.HasOne("BD2.Models.Group", null)
+                        .WithMany("Items")
+                        .HasForeignKey("GroupId");
+
                     b.HasOne("BD2.Models.Photo", "Photo")
                         .WithMany()
                         .HasForeignKey("PhotoId");
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemAtribute", b =>
-                {
-                    b.HasOne("BD2.Models.Atribute", "Atribute")
-                        .WithMany("ItemAtributes")
-                        .HasForeignKey("AtributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BD2.Models.Item", "Item")
-                        .WithMany("ItemAtributes")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemGlobalAtribute", b =>
-                {
-                    b.HasOne("BD2.Models.GlobalAtribute", "GlobalAtribute")
-                        .WithMany("ItemGlobalAtributes")
-                        .HasForeignKey("GlobalAtributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BD2.Models.Item", "Item")
-                        .WithMany("ItemGlobalAtributes")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BD2.Models.ItemGroup", b =>
-                {
-                    b.HasOne("BD2.Models.Group", "Group")
-                        .WithMany("ItemGroups")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BD2.Models.Item", "Item")
-                        .WithMany("ItemGroups")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BD2.Models.LocalItem", b =>

@@ -10,6 +10,6 @@ namespace BD2.Models
         public long Id { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
-        public List<Item> Items { get; set; }
+        public virtual List<ItemGlobalAtribute> ItemGlobalAtributes { get; set; }
     }
 }

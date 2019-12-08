@@ -12,6 +12,12 @@ namespace BD2.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ItemAtribute>().HasKey(ia => new { ia.ItemId, ia.AtributeId });
+            modelBuilder.Entity<ItemGlobalAtribute>().HasKey(iga => new { iga.ItemId, iga.GlobalAtributeId });
+            modelBuilder.Entity<ItemGroup>().HasKey(ig => new { ig.ItemId, ig.GroupId });
+        }
 
         public DbSet<Atribute> Atributes { get; set; }
         public DbSet<Authorization> Authorizations { get; set; }
@@ -24,6 +30,9 @@ namespace BD2.Data
         public DbSet<Photo> Photos { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Value> Values { get; set; }
+        public DbSet<ItemAtribute> ItemAtributes { get; set; }
+        public DbSet<ItemGlobalAtribute> ItemGlobalAtributes { get; set; }
+        public DbSet<ItemGroup> ItemGroups { get; set; }
 
     }
 }
