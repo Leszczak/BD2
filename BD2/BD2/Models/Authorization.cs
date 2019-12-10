@@ -11,5 +11,15 @@ namespace BD2.Models
         public string Name { get; set; }
         public bool CanEdit { get; set; }
         public bool IsGlobal { get; set; }
+        public AuthorizationDto GetDto()
+        {
+            return new AuthorizationDto
+            {
+                Id = this.Id,
+                Name = this.Name,
+                CanEdit = this.CanEdit,
+                IsGlobal = this.IsGlobal
+            };
+        }
     }
 }

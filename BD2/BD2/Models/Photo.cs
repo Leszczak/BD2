@@ -10,5 +10,13 @@ namespace BD2.Models
         public long Id { get; set; }
         public string SaveLocation { get; set; }
         public string Comment { get; set; }
+        public PhotoDto GetDto()
+        {
+            return new PhotoDto
+            {
+                Id = this.Id,
+                Comment = this.Comment
+            };
+        }
     }
 }

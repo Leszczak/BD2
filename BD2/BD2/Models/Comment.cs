@@ -13,5 +13,17 @@ namespace BD2.Models
         public Photo Photo { get; set; }
         public Item Item { get; set; }
         public User User { get; set; }
+        public CommentDto GetDto()
+        {
+            return new CommentDto
+            {
+                Id = this.Id,
+                Title = this.Title,
+                Text = this.Text,
+                PhotoId = this.Photo.Id,
+                ItemId = this.Item.Id,
+                UserId = this.User.Id
+            };
+        }
     }
 }

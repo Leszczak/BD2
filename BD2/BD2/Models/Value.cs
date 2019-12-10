@@ -11,5 +11,15 @@ namespace BD2.Models
         public string Content { get; set; }
         public Atribute Atribute { get; set; }
         public LocalItem LocalItem { get; set; }
+        public ValueDto GetDto()
+        {
+            return new ValueDto
+            {
+                Id = this.Id,
+                Content = this.Content,
+                AtributeId = this.Atribute.Id,
+                LocalItemId = this.LocalItem.Id
+            };
+        }
     }
 }

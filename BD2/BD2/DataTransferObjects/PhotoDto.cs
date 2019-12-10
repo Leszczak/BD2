@@ -8,7 +8,6 @@ namespace BD2.Models
     public class PhotoDto
     {
         public long Id { get; set; }
-        public string SaveLocation { get; set; }
         public string Comment { get; set; }
     }
 }
