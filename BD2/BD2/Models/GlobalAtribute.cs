@@ -7,6 +7,10 @@ namespace BD2.Models
 {
     public class GlobalAtribute
     {
+        public GlobalAtribute()
+        {
+            ItemGlobalAtributes = new List<ItemGlobalAtribute>();
+        }
         public long Id { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }

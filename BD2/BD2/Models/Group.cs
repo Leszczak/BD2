@@ -7,6 +7,10 @@ namespace BD2.Models
 {
     public class Group
     {
+        public Group()
+        {
+            ItemGroups = new List<ItemGroup>();
+        }
         public long Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
