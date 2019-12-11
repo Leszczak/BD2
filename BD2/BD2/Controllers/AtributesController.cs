@@ -57,8 +57,10 @@ namespace BD2.Controllers
             atribute.Name = atributeDto.Name;
             atribute.ItemAtributes = atributeDto.ItemIds
                                         .Select(ii => _context.ItemAtributes
-                                                            .First(ia => ia.AtributeId == atribute.Id
-                                                                        && ia.ItemId == ii)).ToList();
+                                            .First(ia => 
+                                                ia.AtributeId == atribute.Id
+                                                && ia.ItemId == ii))
+                                        .ToList();
             _context.Entry(atribute).State = EntityState.Modified;
 
             try
@@ -89,13 +91,10 @@ namespace BD2.Controllers
             _context.Atributes.Add(new Atribute 
             { 
                 Name = atribute.Name,
-                ItemAtributes =
-                    atribute.ItemIds.Any()
-                    ? atribute.ItemIds
+                ItemAtributes = atribute.ItemIds
                                 .Select(ii => _context.ItemAtributes
                                                     .First(ia => ia.AtributeId == atribute.Id
                                                                 && ia.ItemId == ii)).ToList()
-                    : new List<ItemAtribute>()
             });
             await _context.SaveChangesAsync();
 

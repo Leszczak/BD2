@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/Comments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetComments()
+        public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments()
         {
-            return await _context.Comments.ToListAsync();
+            return await _context.Comments.Select(c => c.GetDto()).ToListAsync();
         }
 
         // GET: api/Comments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Comment>> GetComment(long id)
+        public async Task<ActionResult<CommentDto>> GetComment(long id)
         {
             var comment = await _context.Comments.FindAsync(id);
 
@@ -39,20 +39,25 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return comment;
+            return comment.GetDto();
         }
 
         // PUT: api/Comments/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutComment(long id, Comment comment)
+        public async Task<IActionResult> PutComment(long id, CommentDto commentDto)
         {
-            if (id != comment.Id)
+            if (id != commentDto.Id)
             {
                 return BadRequest();
             }
 
+            var comment = _context.Comments.First(c => c.Id == id);
+            comment.Title = comment.Title;
+            comment.Text = comment.Text;
+            comment.Photo = _context.Photos.First(p => p.Id == commentDto.PhotoId);
+            comment.User = _context.Users.First(u => u.Id == commentDto.UserId);
             _context.Entry(comment).State = EntityState.Modified;
 
             try
@@ -78,9 +83,14 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Comment>> PostComment(Comment comment)
+        public async Task<ActionResult<CommentDto>> PostComment(CommentDto comment)
         {
-            _context.Comments.Add(comment);
+            _context.Comments.Add(new Comment { 
+                Title = comment.Title,
+                Text = comment.Text,
+                Photo = _context.Photos.First(p => p.Id == comment.PhotoId),
+                User = _context.Users.First(u => u.Id == comment.UserId)
+            });
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetComment", new { id = comment.Id }, comment);
@@ -88,7 +98,7 @@ namespace BD2.Controllers
 
         // DELETE: api/Comments/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Comment>> DeleteComment(long id)
+        public async Task<ActionResult<CommentDto>> DeleteComment(long id)
         {
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
@@ -99,7 +109,7 @@ namespace BD2.Controllers
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
 
-            return comment;
+            return comment.GetDto();
         }
 
         private bool CommentExists(long id)

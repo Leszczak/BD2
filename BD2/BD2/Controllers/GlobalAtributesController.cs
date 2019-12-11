@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/GlobalAtributes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GlobalAtribute>>> GetGlobalAtributes()
+        public async Task<ActionResult<IEnumerable<GlobalAtributeDto>>> GetGlobalAtributes()
         {
-            return await _context.GlobalAtributes.ToListAsync();
+            return await _context.GlobalAtributes.Select(ga => ga.GetDto()).ToListAsync();
         }
 
         // GET: api/GlobalAtributes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GlobalAtribute>> GetGlobalAtribute(long id)
+        public async Task<ActionResult<GlobalAtributeDto>> GetGlobalAtribute(long id)
         {
             var globalAtribute = await _context.GlobalAtributes.FindAsync(id);
 
@@ -39,20 +39,29 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return globalAtribute;
+            return globalAtribute.GetDto();
         }
 
         // PUT: api/GlobalAtributes/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGlobalAtribute(long id, GlobalAtribute globalAtribute)
+        public async Task<IActionResult> PutGlobalAtribute(long id, GlobalAtributeDto globalAtributeDto)
         {
-            if (id != globalAtribute.Id)
+            if (id != globalAtributeDto.Id)
             {
                 return BadRequest();
             }
 
+            var globalAtribute = _context.GlobalAtributes.First(ga => ga.Id == id);
+            globalAtribute.Name = globalAtributeDto.Name;
+            globalAtribute.Content = globalAtributeDto.Content;
+            globalAtribute.ItemGlobalAtributes = globalAtributeDto.ItemIds
+                                    .Select(ii => _context.ItemGlobalAtributes
+                                        .First(ia =>
+                                            ia.GlobalAtributeId == globalAtributeDto.Id
+                                            && ia.ItemId == ii))
+                                    .ToList();
             _context.Entry(globalAtribute).State = EntityState.Modified;
 
             try
@@ -78,9 +87,19 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<GlobalAtribute>> PostGlobalAtribute(GlobalAtribute globalAtribute)
+        public async Task<ActionResult<GlobalAtributeDto>> PostGlobalAtribute(GlobalAtributeDto globalAtribute)
         {
-            _context.GlobalAtributes.Add(globalAtribute);
+            _context.GlobalAtributes.Add(new GlobalAtribute
+            {
+                Name = globalAtribute.Name,
+                Content = globalAtribute.Content,
+                ItemGlobalAtributes = globalAtribute.ItemIds
+                                        .Select(ii => _context.ItemGlobalAtributes
+                                            .First(ia =>
+                                                ia.GlobalAtributeId == globalAtribute.Id
+                                                && ia.ItemId == ii))
+                                        .ToList()
+        });
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGlobalAtribute", new { id = globalAtribute.Id }, globalAtribute);
@@ -88,7 +107,7 @@ namespace BD2.Controllers
 
         // DELETE: api/GlobalAtributes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<GlobalAtribute>> DeleteGlobalAtribute(long id)
+        public async Task<ActionResult<GlobalAtributeDto>> DeleteGlobalAtribute(long id)
         {
             var globalAtribute = await _context.GlobalAtributes.FindAsync(id);
             if (globalAtribute == null)
@@ -99,7 +118,7 @@ namespace BD2.Controllers
             _context.GlobalAtributes.Remove(globalAtribute);
             await _context.SaveChangesAsync();
 
-            return globalAtribute;
+            return globalAtribute.GetDto();
         }
 
         private bool GlobalAtributeExists(long id)
