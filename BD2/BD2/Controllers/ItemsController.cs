@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/Items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Item>>> GetItems()
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
         {
-            return await _context.Items.ToListAsync();
+            return await _context.Items.Select(i => i.GetDto()).ToListAsync();
         }
 
         // GET: api/Items/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetItem(long id)
+        public async Task<ActionResult<ItemDto>> GetItem(long id)
         {
             var item = await _context.Items.FindAsync(id);
 
@@ -39,20 +39,39 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return item;
+            return item.GetDto();
         }
 
         // PUT: api/Items/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutItem(long id, Item item)
+        public async Task<IActionResult> PutItem(long id, ItemDto itemDto)
         {
-            if (id != item.Id)
+            if (id != itemDto.Id)
             {
                 return BadRequest();
             }
 
+            var item = _context.Items.First(i => i.Id == itemDto.Id);
+            item.Name = itemDto.Name;
+            item.Description = itemDto.Description;
+            item.Photo = _context.Photos.First(p => p.Id == itemDto.PhotoId);
+            item.ItemAtributes = itemDto.AtributeIds.Select(ai =>
+                                    _context.ItemAtributes.First(ia =>
+                                        ia.ItemId == itemDto.Id
+                                        && ia.AtributeId == ai))
+                                    .ToList();
+            item.ItemGlobalAtributes = itemDto.GlobalAtributeIds.Select(gai =>
+                                    _context.ItemGlobalAtributes.First(iga =>
+                                        iga.ItemId == itemDto.Id
+                                        && iga.GlobalAtributeId == gai))
+                                    .ToList();
+            item.ItemGroups = itemDto.GroupIds.Select(gi =>
+                                    _context.ItemGroups.First(ig =>
+                                        ig.ItemId == itemDto.Id
+                                        && ig.GroupId == gi))
+                                    .ToList();
             _context.Entry(item).State = EntityState.Modified;
 
             try
@@ -78,17 +97,37 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Item>> PostItem(Item item)
+        public async Task<ActionResult<ItemDto>> PostItem(ItemDto itemDto)
         {
-            _context.Items.Add(item);
+            _context.Items.Add(new Item
+            {
+                Name = itemDto.Name,
+                Description = itemDto.Description,
+                Photo = _context.Photos.First(p => p.Id == itemDto.PhotoId),
+                ItemAtributes = itemDto.AtributeIds.Select(ai =>
+                                    _context.ItemAtributes.First(ia =>
+                                        ia.ItemId == itemDto.Id
+                                        && ia.AtributeId == ai))
+                                    .ToList(),
+                ItemGlobalAtributes = itemDto.GlobalAtributeIds.Select(gai =>
+                                    _context.ItemGlobalAtributes.First(iga =>
+                                        iga.ItemId == itemDto.Id
+                                        && iga.GlobalAtributeId == gai))
+                                    .ToList(),
+                ItemGroups = itemDto.GroupIds.Select(gi =>
+                                    _context.ItemGroups.First(ig =>
+                                        ig.ItemId == itemDto.Id
+                                        && ig.GroupId == gi))
+                                    .ToList()
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetItem", new { id = item.Id }, item);
+            return CreatedAtAction("GetItem", new { id = itemDto.Id }, itemDto);
         }
 
         // DELETE: api/Items/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Item>> DeleteItem(long id)
+        public async Task<ActionResult<ItemDto>> DeleteItem(long id)
         {
             var item = await _context.Items.FindAsync(id);
             if (item == null)
@@ -99,7 +138,7 @@ namespace BD2.Controllers
             _context.Items.Remove(item);
             await _context.SaveChangesAsync();
 
-            return item;
+            return item.GetDto();
         }
 
         private bool ItemExists(long id)

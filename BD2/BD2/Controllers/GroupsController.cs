@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<GroupDto>>> GetGroups()
         {
-            return await _context.Groups.ToListAsync();
+            return await _context.Groups.Select(g => g.GetDto()).ToListAsync();
         }
 
         // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Group>> GetGroup(long id)
+        public async Task<ActionResult<GroupDto>> GetGroup(long id)
         {
             var @group = await _context.Groups.FindAsync(id);
 
@@ -39,20 +39,27 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return @group;
+            return @group.GetDto();
         }
 
         // PUT: api/Groups/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGroup(long id, Group @group)
+        public async Task<IActionResult> PutGroup(long id, GroupDto @groupDto)
         {
-            if (id != @group.Id)
+            if (id != @groupDto.Id)
             {
                 return BadRequest();
             }
-
+            var group = _context.Groups.First(g => g.Id == id);
+            group.Name = groupDto.Name;
+            group.Description = groupDto.Description;
+            group.ItemGroups = groupDto.ItemIds.Select(ii =>
+                                _context.ItemGroups.First(ig =>
+                                    ig.GroupId == groupDto.Id
+                                    && ig.ItemId == ii))
+                                .ToList();
             _context.Entry(@group).State = EntityState.Modified;
 
             try
@@ -78,9 +85,19 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(Group @group)
+        public async Task<ActionResult<GroupDto>> PostGroup(GroupDto @group)
         {
-            _context.Groups.Add(@group);
+            _context.Groups.Add(new Group
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description,
+                ItemGroups = group.ItemIds.Select(ii => 
+                                _context.ItemGroups.First(ig => 
+                                    ig.GroupId == group.Id
+                                    && ig.ItemId == ii))
+                                .ToList()
+            });
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
@@ -88,7 +105,7 @@ namespace BD2.Controllers
 
         // DELETE: api/Groups/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Group>> DeleteGroup(long id)
+        public async Task<ActionResult<GroupDto>> DeleteGroup(long id)
         {
             var @group = await _context.Groups.FindAsync(id);
             if (@group == null)
@@ -99,7 +116,7 @@ namespace BD2.Controllers
             _context.Groups.Remove(@group);
             await _context.SaveChangesAsync();
 
-            return @group;
+            return @group.GetDto();
         }
 
         private bool GroupExists(long id)
