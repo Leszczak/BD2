@@ -25,7 +25,10 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GlobalAtributeDto>>> GetGlobalAtributes()
         {
-            return await _context.GlobalAtributes.Select(ga => ga.GetDto()).ToListAsync();
+            return await _context.GlobalAtributes
+                                .Include(ga => ga.ItemGlobalAtributes)
+                                .Select(ga => ga.GetDto())
+                                .ToListAsync();
         }
 
         // GET: api/GlobalAtributes/5
@@ -39,6 +42,7 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(globalAtribute).Reference(ga => ga.ItemGlobalAtributes).Load();
             return globalAtribute.GetDto();
         }
 

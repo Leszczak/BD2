@@ -25,7 +25,10 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AtributeDto>>> GetAtributes()
         {
-            return await _context.Atributes.Select(a => a.ToDto()).ToListAsync();
+            return await _context.Atributes
+                                .Include(a => a.ItemAtributes)
+                                .Select(a => a.ToDto())
+                                .ToListAsync();
         }
 
         // GET: api/Atributes/5
@@ -39,6 +42,7 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(atribute).Reference(a => a.ItemAtributes).Load();
             return atribute.ToDto();
         }
 

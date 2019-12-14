@@ -23,8 +23,8 @@ namespace BD2.Models
                 Email = this.Email,
                 Name = this.Name,
                 Surname = this.Surname,
-                AuthorizationId = this.Authorization.Id,
-                OutpostId = this.Outpost.Id
+                AuthorizationId = this.Authorization == null ? -1 : this.Authorization.Id,
+                OutpostId = this.Outpost == null ? -1 : this.Outpost.Id
             };
         }
     }

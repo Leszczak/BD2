@@ -20,7 +20,7 @@ namespace BD2.Models
                 Id = this.Id,
                 Title = this.Title,
                 Text = this.Text,
-                PhotoId = this.Photo.Id,
+                PhotoId = this.Photo == null ? -1 : this.Photo.Id,
                 ItemId = this.Item.Id,
                 UserId = this.User.Id
             };

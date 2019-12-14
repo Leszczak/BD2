@@ -25,7 +25,11 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ValueDto>>> GetValues()
         {
-            return await _context.Values.Select(v => v.GetDto()).ToListAsync();
+            return await _context.Values
+                                .Include(v => v.Atribute)
+                                .Include(v => v.LocalItem)
+                                .Select(v => v.GetDto())
+                                .ToListAsync();
         }
 
         // GET: api/Values/5
@@ -39,6 +43,8 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(value).Reference(v => v.Atribute).Load();
+            _context.Entry(value).Reference(v => v.LocalItem).Load();
             return value.GetDto();
         }
 

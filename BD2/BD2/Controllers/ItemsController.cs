@@ -25,7 +25,12 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
         {
-            return await _context.Items.Select(i => i.GetDto()).ToListAsync();
+            return await _context.Items
+                                .Include(i => i.Photo)
+                                .Include(i => i.ItemAtributes)
+                                .Include(i => i.ItemGlobalAtributes)
+                                .Include(i => i.ItemGroups)
+                                .Select(i => i.GetDto()).ToListAsync();
         }
 
         // GET: api/Items/5
@@ -39,6 +44,10 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(item).Reference(i => i.Photo).Load();
+            _context.Entry(item).Reference(i => i.ItemAtributes).Load();
+            _context.Entry(item).Reference(i => i.ItemGlobalAtributes).Load();
+            _context.Entry(item).Reference(i => i.ItemGroups).Load();
             return item.GetDto();
         }
 

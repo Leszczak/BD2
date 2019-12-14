@@ -25,7 +25,11 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.Select(u => u.GetDto()).ToListAsync();
+            return await _context.Users
+                                .Include(u => u.Outpost)
+                                .Include(u => u.Authorization)
+                                .Select(u => u.GetDto())
+                                .ToListAsync();
         }
 
         // GET: api/Users/5
@@ -39,6 +43,8 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(user).Reference(u => u.Outpost).Load();
+            _context.Entry(user).Reference(u => u.Authorization).Load();
             return user.GetDto();
         }
 

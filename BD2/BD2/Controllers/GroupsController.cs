@@ -25,7 +25,9 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GroupDto>>> GetGroups()
         {
-            return await _context.Groups.Select(g => g.GetDto()).ToListAsync();
+            return await _context.Groups
+                                .Include(g => g.ItemGroups)
+                                .Select(g => g.GetDto()).ToListAsync();
         }
 
         // GET: api/Groups/5
@@ -39,6 +41,7 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(@group).Reference(g => g.ItemGroups).Load();
             return @group.GetDto();
         }
 

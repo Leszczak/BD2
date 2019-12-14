@@ -25,7 +25,12 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments()
         {
-            return await _context.Comments.Select(c => c.GetDto()).ToListAsync();
+            return await _context.Comments
+                                .Include(c => c.Photo)
+                                .Include(c => c.User)
+                                .Include(c => c.Item)
+                                .Select(c => c.GetDto())
+                                .ToListAsync();
         }
 
         // GET: api/Comments/5
@@ -39,6 +44,9 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(comment).Reference(c => c.Photo).Load();
+            _context.Entry(comment).Reference(c => c.User).Load();
+            _context.Entry(comment).Reference(c => c.Item).Load();
             return comment.GetDto();
         }
 
@@ -56,6 +64,7 @@ namespace BD2.Controllers
             var comment = _context.Comments.First(c => c.Id == id);
             comment.Title = comment.Title;
             comment.Text = comment.Text;
+            comment.Item = _context.Items.First(i => i.Id == commentDto.ItemId);
             comment.Photo = _context.Photos.First(p => p.Id == commentDto.PhotoId);
             comment.User = _context.Users.First(u => u.Id == commentDto.UserId);
             _context.Entry(comment).State = EntityState.Modified;
@@ -89,8 +98,9 @@ namespace BD2.Controllers
                 Title = comment.Title,
                 Text = comment.Text,
                 Photo = _context.Photos.First(p => p.Id == comment.PhotoId),
-                User = _context.Users.First(u => u.Id == comment.UserId)
-            });
+                User = _context.Users.First(u => u.Id == comment.UserId),
+                Item = _context.Items.First(i => i.Id == comment.ItemId)
+        });
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetComment", new { id = comment.Id }, comment);

@@ -25,7 +25,10 @@ namespace BD2.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocalItemDto>>> GetLocalItems()
         {
-            return await _context.LocalItems.Select(li => li.GetDto()).ToListAsync();
+            return await _context.LocalItems
+                                .Include(li => li.Item)
+                                .Include(li => li.Outpost)
+                                .Select(li => li.GetDto()).ToListAsync();
         }
 
         // GET: api/LocalItems/5
@@ -39,6 +42,8 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
+            _context.Entry(localItem).Reference(li => li.Item).Load();
+            _context.Entry(localItem).Reference(li => li.Outpost).Load();
             return localItem.GetDto();
         }
 

@@ -27,7 +27,7 @@ namespace BD2.Models
                 Id = this.Id,
                 Name = this.Name,
                 Description = this.Description,
-                PhotoId = this.Photo.Id,
+                PhotoId = this.Photo == null ? -1 : this.Photo.Id,
                 AtributeIds = this.ItemAtributes.Select(ia => ia.AtributeId).ToList(),
                 GlobalAtributeIds = this.ItemGlobalAtributes.Select(iga => iga.GlobalAtributeId).ToList(),
                 GroupIds = this.ItemGroups.Select(ig => ig.GroupId).ToList()
