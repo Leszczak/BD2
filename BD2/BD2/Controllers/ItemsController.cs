@@ -65,7 +65,9 @@ namespace BD2.Controllers
             var item = _context.Items.First(i => i.Id == itemDto.Id);
             item.Name = itemDto.Name;
             item.Description = itemDto.Description;
-            item.Photo = _context.Photos.First(p => p.Id == itemDto.PhotoId);
+            item.Photo = itemDto.PhotoId == -1
+                         ? null
+                         : _context.Photos.First(p => p.Id == itemDto.PhotoId);
             item.ItemAtributes = itemDto.AtributeIds.Select(ai =>
                                     _context.ItemAtributes.First(ia =>
                                         ia.ItemId == itemDto.Id
@@ -112,7 +114,9 @@ namespace BD2.Controllers
             {
                 Name = itemDto.Name,
                 Description = itemDto.Description,
-                Photo = _context.Photos.First(p => p.Id == itemDto.PhotoId),
+                Photo = itemDto.PhotoId == -1
+                        ? null
+                        : _context.Photos.First(p => p.Id == itemDto.PhotoId),
                 ItemAtributes = itemDto.AtributeIds.Select(ai =>
                                     _context.ItemAtributes.First(ia =>
                                         ia.ItemId == itemDto.Id

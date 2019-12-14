@@ -63,8 +63,12 @@ namespace BD2.Controllers
             user.Email = userDto.Email;
             user.Name = userDto.Name;
             user.Surname = userDto.Surname;
-            user.Authorization = _context.Authorizations.First(a => a.Id == userDto.AuthorizationId);
-            user.Outpost = _context.Outposts.First(o => o.Id == userDto.OutpostId);
+            user.Authorization = userDto.AuthorizationId == -1
+                                    ? null
+                                    : _context.Authorizations.First(a => a.Id == userDto.AuthorizationId);
+            user.Outpost = userDto.OutpostId == -1
+                            ? null
+                            : _context.Outposts.First(o => o.Id == userDto.OutpostId);
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -97,8 +101,12 @@ namespace BD2.Controllers
                 Email = userDto.Email,
                 Name = userDto.Name,
                 Surname = userDto.Surname,
-                Authorization = _context.Authorizations.First(a => a.Id == userDto.AuthorizationId),
-                Outpost = _context.Outposts.First(o => o.Id == userDto.OutpostId)
+                Authorization = userDto.AuthorizationId == -1
+                                ? null
+                                : _context.Authorizations.First(a => a.Id == userDto.AuthorizationId),
+                Outpost = userDto.OutpostId == -1
+                            ? null
+                            : _context.Outposts.First(o => o.Id == userDto.OutpostId)
             });
             await _context.SaveChangesAsync();
 

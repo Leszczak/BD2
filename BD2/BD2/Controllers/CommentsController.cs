@@ -65,7 +65,9 @@ namespace BD2.Controllers
             comment.Title = comment.Title;
             comment.Text = comment.Text;
             comment.Item = _context.Items.First(i => i.Id == commentDto.ItemId);
-            comment.Photo = _context.Photos.First(p => p.Id == commentDto.PhotoId);
+            comment.Photo = commentDto.PhotoId == -1
+                            ? null
+                            : _context.Photos.First(p => p.Id == commentDto.PhotoId);
             comment.User = _context.Users.First(u => u.Id == commentDto.UserId);
             _context.Entry(comment).State = EntityState.Modified;
 
@@ -97,7 +99,9 @@ namespace BD2.Controllers
             _context.Comments.Add(new Comment { 
                 Title = comment.Title,
                 Text = comment.Text,
-                Photo = _context.Photos.First(p => p.Id == comment.PhotoId),
+                Photo = comment.PhotoId == -1  
+                        ? null 
+                        : _context.Photos.First(p => p.Id == comment.PhotoId),
                 User = _context.Users.First(u => u.Id == comment.UserId),
                 Item = _context.Items.First(i => i.Id == comment.ItemId)
         });
