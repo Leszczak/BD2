@@ -23,14 +23,17 @@ namespace BD2.Controllers
 
         // GET: api/LocalItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LocalItem>>> GetLocalItems()
+        public async Task<ActionResult<IEnumerable<LocalItemDto>>> GetLocalItems()
         {
-            return await _context.LocalItems.ToListAsync();
+            return await _context.LocalItems
+                                .Include(li => li.Item)
+                                .Include(li => li.Outpost)
+                                .Select(li => li.GetDto()).ToListAsync();
         }
 
         // GET: api/LocalItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<LocalItem>> GetLocalItem(long id)
+        public async Task<ActionResult<LocalItemDto>> GetLocalItem(long id)
         {
             var localItem = await _context.LocalItems.FindAsync(id);
 
@@ -39,20 +42,25 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return localItem;
+            _context.Entry(localItem).Reference(li => li.Item).Load();
+            _context.Entry(localItem).Reference(li => li.Outpost).Load();
+            return localItem.GetDto();
         }
 
         // PUT: api/LocalItems/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLocalItem(long id, LocalItem localItem)
+        public async Task<IActionResult> PutLocalItem(long id, LocalItemDto localItemDto)
         {
-            if (id != localItem.Id)
+            if (id != localItemDto.Id)
             {
                 return BadRequest();
             }
 
+            var localItem = _context.LocalItems.First(li => li.Id == localItemDto.Id);
+            localItem.Item = _context.Items.First(i => i.Id == localItemDto.ItemId);
+            localItem.Outpost = _context.Outposts.First(o => o.Id == localItemDto.OutpostId);
             _context.Entry(localItem).State = EntityState.Modified;
 
             try
@@ -78,17 +86,21 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<LocalItem>> PostLocalItem(LocalItem localItem)
+        public async Task<ActionResult<LocalItemDto>> PostLocalItem(LocalItemDto localItemDto)
         {
-            _context.LocalItems.Add(localItem);
+            _context.LocalItems.Add(new LocalItem
+            {
+                Item = _context.Items.First(i => i.Id == localItemDto.ItemId),
+                Outpost = _context.Outposts.First(o => o.Id == localItemDto.OutpostId)
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetLocalItem", new { id = localItem.Id }, localItem);
+            return CreatedAtAction("GetLocalItem", new { id = localItemDto.Id }, localItemDto);
         }
 
         // DELETE: api/LocalItems/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<LocalItem>> DeleteLocalItem(long id)
+        public async Task<ActionResult<LocalItemDto>> DeleteLocalItem(long id)
         {
             var localItem = await _context.LocalItems.FindAsync(id);
             if (localItem == null)
@@ -97,9 +109,10 @@ namespace BD2.Controllers
             }
 
             _context.LocalItems.Remove(localItem);
+            _context.Values.RemoveRange(
+                _context.Values.Where(v => v.LocalItem == localItem));
             await _context.SaveChangesAsync();
-
-            return localItem;
+            return localItem.GetDto();
         }
 
         private bool LocalItemExists(long id)

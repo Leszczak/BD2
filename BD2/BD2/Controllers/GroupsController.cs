@@ -23,36 +23,59 @@ namespace BD2.Controllers
 
         // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<GroupDto>>> GetGroups()
         {
-            return await _context.Groups.ToListAsync();
+            return await _context.Groups
+                                .Include(g => g.ItemGroups)
+                                .Select(g => g.GetDto()).ToListAsync();
         }
 
         // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Group>> GetGroup(long id)
+        public async Task<ActionResult<GroupDto>> GetGroup(long id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var @group = _context.Groups.Include(g => g.ItemGroups).First(g => g.Id == id);
 
             if (@group == null)
             {
                 return NotFound();
             }
 
-            return @group;
+            return @group.GetDto();
         }
 
         // PUT: api/Groups/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGroup(long id, Group @group)
+        public async Task<IActionResult> PutGroup(long id, GroupDto @groupDto)
         {
-            if (id != @group.Id)
+            if (id != @groupDto.Id)
             {
                 return BadRequest();
             }
-
+            var group = _context.Groups.First(g => g.Id == id);
+            group.Name = groupDto.Name;
+            group.Description = groupDto.Description;
+            foreach (long ii in groupDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemGroups.Any(ia =>
+                                                     ia.ItemId == ii
+                                                     && ia.GroupId == group.Id))
+                    {
+                        ItemGroup temp = new ItemGroup
+                        {
+                            Item = _context.Items.First(i => i.Id == ii),
+                            Group = group
+                        };
+                        _context.ItemGroups.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
             _context.Entry(@group).State = EntityState.Modified;
 
             try
@@ -78,9 +101,31 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(Group @group)
+        public async Task<ActionResult<GroupDto>> PostGroup(GroupDto groupDto)
         {
-            _context.Groups.Add(@group);
+            Group group = new Group
+            {
+                Id = groupDto.Id,
+                Name = groupDto.Name,
+                Description = groupDto.Description
+
+            };
+            foreach (long ii in groupDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    ItemGroup temp = new ItemGroup
+                    {
+                        Item = _context.Items.First(i => i.Id == ii),
+                        Group = group
+                    };
+                    _context.ItemGroups.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+
+            _context.Groups.Add(group);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
@@ -88,7 +133,7 @@ namespace BD2.Controllers
 
         // DELETE: api/Groups/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Group>> DeleteGroup(long id)
+        public async Task<ActionResult<GroupDto>> DeleteGroup(long id)
         {
             var @group = await _context.Groups.FindAsync(id);
             if (@group == null)
@@ -97,9 +142,10 @@ namespace BD2.Controllers
             }
 
             _context.Groups.Remove(@group);
+            _context.ItemGroups.RemoveRange(
+                _context.ItemGroups.Where(ig => ig.Group == group));
             await _context.SaveChangesAsync();
-
-            return @group;
+            return @group.GetDto();
         }
 
         private bool GroupExists(long id)

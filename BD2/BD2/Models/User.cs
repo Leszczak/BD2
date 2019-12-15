@@ -15,5 +15,17 @@ namespace BD2.Models
         public string Surname { get; set; }
         public Authorization Authorization { get; set; }
         public Outpost Outpost { get; set; }
+        public UserDto GetDto()
+        {
+            return new UserDto
+            {
+                Id = this.Id,
+                Email = this.Email,
+                Name = this.Name,
+                Surname = this.Surname,
+                AuthorizationId = this.Authorization == null ? -1 : this.Authorization.Id,
+                OutpostId = this.Outpost == null ? -1 : this.Outpost.Id
+            };
+        }
     }
 }

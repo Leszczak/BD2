@@ -23,14 +23,18 @@ namespace BD2.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users
+                                .Include(u => u.Outpost)
+                                .Include(u => u.Authorization)
+                                .Select(u => u.GetDto())
+                                .ToListAsync();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(long id)
+        public async Task<ActionResult<UserDto>> GetUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -39,20 +43,32 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return user;
+            _context.Entry(user).Reference(u => u.Outpost).Load();
+            _context.Entry(user).Reference(u => u.Authorization).Load();
+            return user.GetDto();
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
+        public async Task<IActionResult> PutUser(long id, UserDto userDto)
         {
-            if (id != user.Id)
+            if (id != userDto.Id)
             {
                 return BadRequest();
             }
 
+            var user = _context.Users.First(u => u.Id == userDto.Id);
+            user.Email = userDto.Email;
+            user.Name = userDto.Name;
+            user.Surname = userDto.Surname;
+            user.Authorization = userDto.AuthorizationId == -1
+                                    ? null
+                                    : _context.Authorizations.First(a => a.Id == userDto.AuthorizationId);
+            user.Outpost = userDto.OutpostId == -1
+                            ? null
+                            : _context.Outposts.First(o => o.Id == userDto.OutpostId);
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -78,17 +94,28 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
         {
-            _context.Users.Add(user);
+            _context.Users.Add(new Models.User
+            {
+                Email = userDto.Email,
+                Name = userDto.Name,
+                Surname = userDto.Surname,
+                Authorization = userDto.AuthorizationId == -1
+                                ? null
+                                : _context.Authorizations.First(a => a.Id == userDto.AuthorizationId),
+                Outpost = userDto.OutpostId == -1
+                            ? null
+                            : _context.Outposts.First(o => o.Id == userDto.OutpostId)
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction("GetUser", new { id = userDto.Id }, userDto);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(long id)
+        public async Task<ActionResult<UserDto>> DeleteUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -97,9 +124,10 @@ namespace BD2.Controllers
             }
 
             _context.Users.Remove(user);
+            _context.Comments.RemoveRange(
+                _context.Comments.Where(c => c.User == user));
             await _context.SaveChangesAsync();
-
-            return user;
+            return user.GetDto();
         }
 
         private bool UserExists(long id)

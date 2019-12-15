@@ -23,36 +23,60 @@ namespace BD2.Controllers
 
         // GET: api/Atributes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Atribute>>> GetAtributes()
+        public async Task<ActionResult<IEnumerable<AtributeDto>>> GetAtributes()
         {
-            return await _context.Atributes.ToListAsync();
+            return await _context.Atributes
+                                .Include(a => a.ItemAtributes)
+                                .Select(a => a.ToDto())
+                                .ToListAsync();
         }
 
         // GET: api/Atributes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Atribute>> GetAtribute(long id)
+        public async Task<ActionResult<AtributeDto>> GetAtribute(long id)
         {
-            var atribute = await _context.Atributes.FindAsync(id);
+            var atribute = _context.Atributes.Include(a => a.ItemAtributes).FirstOrDefault(a => a.Id == id);
 
             if (atribute == null)
             {
                 return NotFound();
             }
 
-            return atribute;
+            return atribute.ToDto();
         }
 
         // PUT: api/Atributes/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAtribute(long id, Atribute atribute)
+        public async Task<IActionResult> PutAtribute(long id, AtributeDto atributeDto)
         {
-            if (id != atribute.Id)
+            if (id != atributeDto.Id)
             {
                 return BadRequest();
             }
 
+            var atribute = await _context.Atributes.FindAsync(id);
+            atribute.Name = atributeDto.Name;
+            foreach(long ii in atributeDto.ItemIds)
+            {
+                if(_context.Items.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemAtributes.Any(ia =>
+                                                     ia.ItemId == ii
+                                                     && ia.AtributeId == atribute.Id))
+                    {
+                        ItemAtribute temp = new ItemAtribute
+                        {
+                            Item = _context.Items.First(i => i.Id == ii),
+                            Atribute = atribute
+                        };
+                        _context.ItemAtributes.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
             _context.Entry(atribute).State = EntityState.Modified;
 
             try
@@ -78,8 +102,27 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Atribute>> PostAtribute(Atribute atribute)
+        public async Task<ActionResult<Atribute>> PostAtribute(AtributeDto atributeDto)
         {
+            Atribute atribute = new Atribute
+            {
+                Name = atributeDto.Name
+            };
+            foreach(long ii in atributeDto.ItemIds)
+            {
+                if(_context.Items.Any(i => i.Id == ii))
+                {
+                    ItemAtribute temp = new ItemAtribute
+                    {
+                        Item = _context.Items.First(i => i.Id == ii),
+                        Atribute = atribute
+                    };
+                    _context.ItemAtributes.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+
             _context.Atributes.Add(atribute);
             await _context.SaveChangesAsync();
 
@@ -88,7 +131,7 @@ namespace BD2.Controllers
 
         // DELETE: api/Atributes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Atribute>> DeleteAtribute(long id)
+        public async Task<ActionResult<AtributeDto>> DeleteAtribute(long id)
         {
             var atribute = await _context.Atributes.FindAsync(id);
             if (atribute == null)
@@ -97,9 +140,13 @@ namespace BD2.Controllers
             }
 
             _context.Atributes.Remove(atribute);
-            await _context.SaveChangesAsync();
+            _context.Values.RemoveRange(
+                _context.Values.Where(v => v.Atribute == atribute));
+            _context.ItemAtributes.RemoveRange(
+                _context.ItemAtributes.Where(ia => ia.Atribute == atribute));
 
-            return atribute;
+            await _context.SaveChangesAsync();
+            return atribute.ToDto();
         }
 
         private bool AtributeExists(long id)

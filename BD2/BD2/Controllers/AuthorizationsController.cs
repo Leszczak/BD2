@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/Authorizations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Authorization>>> GetAuthorizations()
+        public async Task<ActionResult<IEnumerable<AuthorizationDto>>> GetAuthorizations()
         {
-            return await _context.Authorizations.ToListAsync();
+            return await _context.Authorizations.Select(a => a.GetDto()).ToListAsync();
         }
 
         // GET: api/Authorizations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Authorization>> GetAuthorization(long id)
+        public async Task<ActionResult<AuthorizationDto>> GetAuthorization(long id)
         {
             var authorization = await _context.Authorizations.FindAsync(id);
 
@@ -39,20 +39,24 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return authorization;
+            return authorization.GetDto();
         }
 
         // PUT: api/Authorizations/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAuthorization(long id, Authorization authorization)
+        public async Task<IActionResult> PutAuthorization(long id, AuthorizationDto authorizationDto)
         {
-            if (id != authorization.Id)
+            if (id != authorizationDto.Id)
             {
                 return BadRequest();
             }
 
+            var authorization = await _context.Authorizations.FindAsync(id);
+            authorization.IsGlobal = authorizationDto.IsGlobal;
+            authorization.Name = authorizationDto.Name;
+            authorization.CanEdit = authorizationDto.CanEdit;
             _context.Entry(authorization).State = EntityState.Modified;
 
             try
@@ -78,9 +82,14 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Authorization>> PostAuthorization(Authorization authorization)
+        public async Task<ActionResult<AuthorizationDto>> PostAuthorization(AuthorizationDto authorization)
         {
-            _context.Authorizations.Add(authorization);
+            _context.Authorizations.Add(new Authorization
+            {
+                Name = authorization.Name,
+                IsGlobal = authorization.IsGlobal,
+                CanEdit = authorization.CanEdit
+            });
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAuthorization", new { id = authorization.Id }, authorization);
@@ -88,7 +97,7 @@ namespace BD2.Controllers
 
         // DELETE: api/Authorizations/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Authorization>> DeleteAuthorization(long id)
+        public async Task<ActionResult<AuthorizationDto>> DeleteAuthorization(long id)
         {
             var authorization = await _context.Authorizations.FindAsync(id);
             if (authorization == null)
@@ -97,9 +106,11 @@ namespace BD2.Controllers
             }
 
             _context.Authorizations.Remove(authorization);
-            await _context.SaveChangesAsync();
+            foreach (User u in _context.Users.Include(u => u.Authorization).Where(u => u.Authorization == authorization))
+                u.Authorization = null;
 
-            return authorization;
+            await _context.SaveChangesAsync();
+            return authorization.GetDto();
         }
 
         private bool AuthorizationExists(long id)

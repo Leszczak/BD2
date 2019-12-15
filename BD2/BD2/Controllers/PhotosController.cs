@@ -23,14 +23,14 @@ namespace BD2.Controllers
 
         // GET: api/Photos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
+        public async Task<ActionResult<IEnumerable<PhotoDto>>> GetPhotos()
         {
-            return await _context.Photos.ToListAsync();
+            return await _context.Photos.Select(p => p.GetDto()).ToListAsync();
         }
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Photo>> GetPhoto(long id)
+        public async Task<ActionResult<PhotoDto>> GetPhoto(long id)
         {
             var photo = await _context.Photos.FindAsync(id);
 
@@ -39,20 +39,22 @@ namespace BD2.Controllers
                 return NotFound();
             }
 
-            return photo;
+            return photo.GetDto();
         }
 
         // PUT: api/Photos/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhoto(long id, Photo photo)
+        public async Task<IActionResult> PutPhoto(long id, PhotoDto photoDto)
         {
-            if (id != photo.Id)
+            if (id != photoDto.Id)
             {
                 return BadRequest();
             }
 
+            var photo = _context.Photos.First(p => p.Id == photoDto.Id);
+            photo.Comment = photoDto.Comment;
             _context.Entry(photo).State = EntityState.Modified;
 
             try
@@ -78,17 +80,20 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
+        public async Task<ActionResult<PhotoDto>> PostPhoto(PhotoDto photoDto)
         {
-            _context.Photos.Add(photo);
+            _context.Photos.Add(new Photo
+            {
+                Comment = photoDto.Comment
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+            return CreatedAtAction("GetPhoto", new { id = photoDto.Id }, photoDto);
         }
 
         // DELETE: api/Photos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Photo>> DeletePhoto(long id)
+        public async Task<ActionResult<PhotoDto>> DeletePhoto(long id)
         {
             var photo = await _context.Photos.FindAsync(id);
             if (photo == null)
@@ -97,9 +102,17 @@ namespace BD2.Controllers
             }
 
             _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
+            await _context.Comments
+                        .Include(c => c.Photo)
+                        .Where(c => c.Photo == photo)
+                        .ForEachAsync(c => c.Photo = null);
+            await _context.Items
+                        .Include(i => i.Photo)
+                        .Where(i => i.Photo == photo)
+                        .ForEachAsync(i => i.Photo = null);
 
-            return photo;
+            await _context.SaveChangesAsync();
+            return photo.GetDto();
         }
 
         private bool PhotoExists(long id)
