@@ -60,12 +60,25 @@ namespace BD2.Controllers
             var globalAtribute = _context.GlobalAtributes.First(ga => ga.Id == id);
             globalAtribute.Name = globalAtributeDto.Name;
             globalAtribute.Content = globalAtributeDto.Content;
-            globalAtribute.ItemGlobalAtributes = globalAtributeDto.ItemIds
-                                    .Select(ii => _context.ItemGlobalAtributes
-                                        .First(ia =>
-                                            ia.GlobalAtributeId == globalAtributeDto.Id
-                                            && ia.ItemId == ii))
-                                    .ToList();
+            foreach (long ii in globalAtributeDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemGlobalAtributes.Any(ia =>
+                                                     ia.ItemId == ii
+                                                     && ia.GlobalAtributeId == globalAtribute.Id))
+                    {
+                        ItemGlobalAtribute temp = new ItemGlobalAtribute
+                        {
+                            Item = _context.Items.First(i => i.Id == ii),
+                            GlobalAtribute = globalAtribute
+                        };
+                        _context.ItemGlobalAtributes.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
             _context.Entry(globalAtribute).State = EntityState.Modified;
 
             try

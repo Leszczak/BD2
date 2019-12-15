@@ -57,11 +57,25 @@ namespace BD2.Controllers
             var group = _context.Groups.First(g => g.Id == id);
             group.Name = groupDto.Name;
             group.Description = groupDto.Description;
-            group.ItemGroups = groupDto.ItemIds.Select(ii =>
-                                _context.ItemGroups.First(ig =>
-                                    ig.GroupId == groupDto.Id
-                                    && ig.ItemId == ii))
-                                .ToList();
+            foreach (long ii in groupDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemGroups.Any(ia =>
+                                                     ia.ItemId == ii
+                                                     && ia.GroupId == group.Id))
+                    {
+                        ItemGroup temp = new ItemGroup
+                        {
+                            Item = _context.Items.First(i => i.Id == ii),
+                            Group = group
+                        };
+                        _context.ItemGroups.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
             _context.Entry(@group).State = EntityState.Modified;
 
             try

@@ -69,21 +69,63 @@ namespace BD2.Controllers
             item.Photo = itemDto.PhotoId == -1
                          ? null
                          : _context.Photos.First(p => p.Id == itemDto.PhotoId);
-            item.ItemAtributes = itemDto.AtributeIds.Select(ai =>
-                                    _context.ItemAtributes.First(ia =>
-                                        ia.ItemId == itemDto.Id
-                                        && ia.AtributeId == ai))
-                                    .ToList();
-            item.ItemGlobalAtributes = itemDto.GlobalAtributeIds.Select(gai =>
-                                    _context.ItemGlobalAtributes.First(iga =>
-                                        iga.ItemId == itemDto.Id
-                                        && iga.GlobalAtributeId == gai))
-                                    .ToList();
-            item.ItemGroups = itemDto.GroupIds.Select(gi =>
-                                    _context.ItemGroups.First(ig =>
-                                        ig.ItemId == itemDto.Id
-                                        && ig.GroupId == gi))
-                                    .ToList();
+            foreach (long ii in itemDto.AtributeIds)
+            {
+                if (_context.Atributes.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemAtributes.Any(ia =>
+                                                     ia.ItemId == itemDto.Id
+                                                     && ia.AtributeId == ii))
+                    {
+                        ItemAtribute temp = new ItemAtribute
+                        {
+                            Item = item,
+                            Atribute = _context.Atributes.First(i => i.Id == ii)
+                        };
+                        _context.ItemAtributes.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
+            foreach (long ii in itemDto.GlobalAtributeIds)
+            {
+                if (_context.GlobalAtributes.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemGlobalAtributes.Any(ia =>
+                                                     ia.ItemId == itemDto.Id
+                                                     && ia.GlobalAtributeId == ii))
+                    {
+                        ItemGlobalAtribute temp = new ItemGlobalAtribute
+                        {
+                            Item = item,
+                            GlobalAtribute = _context.GlobalAtributes.First(i => i.Id == ii)
+                        };
+                        _context.ItemGlobalAtributes.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
+            foreach (long ii in itemDto.GroupIds)
+            {
+                if (_context.Groups.Any(i => i.Id == ii))
+                {
+                    if (!_context.ItemGroups.Any(ia =>
+                                                     ia.ItemId == itemDto.Id
+                                                     && ia.GroupId == ii))
+                    {
+                        ItemGroup temp = new ItemGroup
+                        {
+                            Item = item,
+                            Group = _context.Groups.First(i => i.Id == ii)
+                        };
+                        _context.ItemGroups.Add(temp);
+                    }
+                }
+                else
+                    return BadRequest();
+            }
             _context.Entry(item).State = EntityState.Modified;
 
             try
