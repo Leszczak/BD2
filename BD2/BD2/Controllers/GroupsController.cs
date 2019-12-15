@@ -34,14 +34,13 @@ namespace BD2.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupDto>> GetGroup(long id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var @group = _context.Groups.Include(g => g.ItemGroups).First(g => g.Id == id);
 
             if (@group == null)
             {
                 return NotFound();
             }
 
-            _context.Entry(@group).Reference(g => g.ItemGroups).Load();
             return @group.GetDto();
         }
 
@@ -88,19 +87,31 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<GroupDto>> PostGroup(GroupDto @group)
+        public async Task<ActionResult<GroupDto>> PostGroup(GroupDto groupDto)
         {
-            _context.Groups.Add(new Group
+            Group group = new Group
             {
-                Id = group.Id,
-                Name = group.Name,
-                Description = group.Description,
-                ItemGroups = group.ItemIds.Select(ii => 
-                                _context.ItemGroups.First(ig => 
-                                    ig.GroupId == group.Id
-                                    && ig.ItemId == ii))
-                                .ToList()
-            });
+                Id = groupDto.Id,
+                Name = groupDto.Name,
+                Description = groupDto.Description
+
+            };
+            foreach (long ii in groupDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    ItemGroup temp = new ItemGroup
+                    {
+                        Item = _context.Items.First(i => i.Id == ii),
+                        Group = group
+                    };
+                    _context.ItemGroups.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+
+            _context.Groups.Add(group);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);

@@ -35,14 +35,14 @@ namespace BD2.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GlobalAtributeDto>> GetGlobalAtribute(long id)
         {
-            var globalAtribute = await _context.GlobalAtributes.FindAsync(id);
-
+            var globalAtribute = _context.GlobalAtributes
+                                            .Include(ga => ga.ItemGlobalAtributes)
+                                            .First(ga => ga.Id == id);
             if (globalAtribute == null)
             {
                 return NotFound();
             }
 
-            _context.Entry(globalAtribute).Reference(ga => ga.ItemGlobalAtributes).Load();
             return globalAtribute.GetDto();
         }
 
@@ -91,19 +91,29 @@ namespace BD2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<GlobalAtributeDto>> PostGlobalAtribute(GlobalAtributeDto globalAtribute)
+        public async Task<ActionResult<GlobalAtributeDto>> PostGlobalAtribute(GlobalAtributeDto globalAtributeDto)
         {
-            _context.GlobalAtributes.Add(new GlobalAtribute
+            GlobalAtribute globalAtribute = new GlobalAtribute
             {
-                Name = globalAtribute.Name,
-                Content = globalAtribute.Content,
-                ItemGlobalAtributes = globalAtribute.ItemIds
-                                        .Select(ii => _context.ItemGlobalAtributes
-                                            .First(ia =>
-                                                ia.GlobalAtributeId == globalAtribute.Id
-                                                && ia.ItemId == ii))
-                                        .ToList()
-        });
+                Name = globalAtributeDto.Name,
+                Content = globalAtributeDto.Content
+            };
+            foreach (long ii in globalAtributeDto.ItemIds)
+            {
+                if (_context.Items.Any(i => i.Id == ii))
+                {
+                    ItemGlobalAtribute temp = new ItemGlobalAtribute
+                    {
+                        Item = _context.Items.First(i => i.Id == ii),
+                        GlobalAtribute = globalAtribute
+                    };
+                    _context.ItemGlobalAtributes.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+
+            _context.GlobalAtributes.Add(globalAtribute);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGlobalAtribute", new { id = globalAtribute.Id }, globalAtribute);

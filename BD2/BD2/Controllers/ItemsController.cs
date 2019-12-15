@@ -37,17 +37,18 @@ namespace BD2.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ItemDto>> GetItem(long id)
         {
-            var item = await _context.Items.FindAsync(id);
+            var item = _context.Items
+                                .Include(i => i.Photo)
+                                .Include(i => i.ItemAtributes)
+                                .Include(i => i.ItemGlobalAtributes)
+                                .Include(i => i.ItemGroups)
+                                .First(i => i.Id == id);
 
             if (item == null)
             {
                 return NotFound();
             }
 
-            _context.Entry(item).Reference(i => i.Photo).Load();
-            _context.Entry(item).Reference(i => i.ItemAtributes).Load();
-            _context.Entry(item).Reference(i => i.ItemGlobalAtributes).Load();
-            _context.Entry(item).Reference(i => i.ItemGroups).Load();
             return item.GetDto();
         }
 
@@ -110,29 +111,59 @@ namespace BD2.Controllers
         [HttpPost]
         public async Task<ActionResult<ItemDto>> PostItem(ItemDto itemDto)
         {
-            _context.Items.Add(new Item
+            Item item = new Item
             {
                 Name = itemDto.Name,
                 Description = itemDto.Description,
                 Photo = itemDto.PhotoId == -1
                         ? null
-                        : _context.Photos.First(p => p.Id == itemDto.PhotoId),
-                ItemAtributes = itemDto.AtributeIds.Select(ai =>
-                                    _context.ItemAtributes.First(ia =>
-                                        ia.ItemId == itemDto.Id
-                                        && ia.AtributeId == ai))
-                                    .ToList(),
-                ItemGlobalAtributes = itemDto.GlobalAtributeIds.Select(gai =>
-                                    _context.ItemGlobalAtributes.First(iga =>
-                                        iga.ItemId == itemDto.Id
-                                        && iga.GlobalAtributeId == gai))
-                                    .ToList(),
-                ItemGroups = itemDto.GroupIds.Select(gi =>
-                                    _context.ItemGroups.First(ig =>
-                                        ig.ItemId == itemDto.Id
-                                        && ig.GroupId == gi))
-                                    .ToList()
-            });
+                        : _context.Photos.First(p => p.Id == itemDto.PhotoId)
+            };
+
+            foreach (long ai in itemDto.AtributeIds)
+            {
+                if (_context.Atributes.Any(a => a.Id == ai))
+                {
+                    ItemAtribute temp = new ItemAtribute
+                    {
+                        Item = item,
+                        Atribute = _context.Atributes.First(a => a.Id == ai)
+                    };
+                    _context.ItemAtributes.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+            foreach (long gai in itemDto.GlobalAtributeIds)
+            {
+                if (_context.GlobalAtributes.Any(ga => ga.Id == gai))
+                {
+                    ItemGlobalAtribute temp = new ItemGlobalAtribute
+                    {
+                        Item = item,
+                        GlobalAtribute = _context.GlobalAtributes.First(ga => ga.Id == gai)
+                    };
+                    _context.ItemGlobalAtributes.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+            foreach (long gi in itemDto.GroupIds)
+            {
+                if (_context.Groups.Any(g => g.Id == gi))
+                {
+                    ItemGroup temp = new ItemGroup
+                    {
+                        Item = item,
+                        Group = _context.Groups.First(g => g.Id == gi)
+                    };
+                    _context.ItemGroups.Add(temp);
+                }
+                else
+                    return BadRequest();
+            }
+
+            _context.Items.Add(item);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetItem", new { id = itemDto.Id }, itemDto);
