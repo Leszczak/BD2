@@ -106,8 +106,10 @@ namespace BD2.Controllers
             }
 
             _context.Authorizations.Remove(authorization);
-            await _context.SaveChangesAsync();
+            foreach (User u in _context.Users.Include(u => u.Authorization).Where(u => u.Authorization == authorization))
+                u.Authorization = null;
 
+            await _context.SaveChangesAsync();
             return authorization.GetDto();
         }
 

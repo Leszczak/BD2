@@ -102,8 +102,16 @@ namespace BD2.Controllers
             }
 
             _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
+            await _context.Comments
+                        .Include(c => c.Photo)
+                        .Where(c => c.Photo == photo)
+                        .ForEachAsync(c => c.Photo = null);
+            await _context.Items
+                        .Include(i => i.Photo)
+                        .Where(i => i.Photo == photo)
+                        .ForEachAsync(i => i.Photo = null);
 
+            await _context.SaveChangesAsync();
             return photo.GetDto();
         }
 

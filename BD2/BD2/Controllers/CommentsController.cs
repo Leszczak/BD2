@@ -115,14 +115,16 @@ namespace BD2.Controllers
         public async Task<ActionResult<CommentDto>> DeleteComment(long id)
         {
             var comment = await _context.Comments.FindAsync(id);
+            _context.Entry(comment).Reference(c => c.Photo).Load();
             if (comment == null)
             {
                 return NotFound();
             }
 
             _context.Comments.Remove(comment);
+            if (comment.Photo != null)
+                _context.Photos.Remove(comment.Photo);
             await _context.SaveChangesAsync();
-
             return comment.GetDto();
         }
 

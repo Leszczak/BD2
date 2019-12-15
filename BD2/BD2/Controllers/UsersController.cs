@@ -124,8 +124,9 @@ namespace BD2.Controllers
             }
 
             _context.Users.Remove(user);
+            _context.Comments.RemoveRange(
+                _context.Comments.Where(c => c.User == user));
             await _context.SaveChangesAsync();
-
             return user.GetDto();
         }
 

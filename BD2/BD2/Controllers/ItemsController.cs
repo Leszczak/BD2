@@ -173,15 +173,28 @@ namespace BD2.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<ItemDto>> DeleteItem(long id)
         {
-            var item = await _context.Items.FindAsync(id);
+            var item = _context.Items
+                                .Include(i => i.Photo)
+                                .First(i => i.Id == id);
             if (item == null)
             {
                 return NotFound();
             }
 
             _context.Items.Remove(item);
+            if (item.Photo != null)
+                _context.Photos.Remove(item.Photo);
+            _context.ItemGroups.RemoveRange(
+                _context.ItemGroups.Where(ig => ig.Item == item));
+            _context.ItemAtributes.RemoveRange(
+                _context.ItemAtributes.Where(iga => iga.Item == item));
+            _context.ItemGlobalAtributes.RemoveRange(
+                _context.ItemGlobalAtributes.Where(ia => ia.Item == item));
+            _context.Comments.RemoveRange(
+                _context.Comments.Where(c => c.Item == item));
+            _context.LocalItems.RemoveRange(
+                _context.LocalItems.Where(li => li.Item == item));
             await _context.SaveChangesAsync();
-
             return item.GetDto();
         }
 

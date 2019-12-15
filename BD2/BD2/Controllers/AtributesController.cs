@@ -140,8 +140,12 @@ namespace BD2.Controllers
             }
 
             _context.Atributes.Remove(atribute);
-            await _context.SaveChangesAsync();
+            _context.Values.RemoveRange(
+                _context.Values.Where(v => v.Atribute == atribute));
+            _context.ItemAtributes.RemoveRange(
+                _context.ItemAtributes.Where(ia => ia.Atribute == atribute));
 
+            await _context.SaveChangesAsync();
             return atribute.ToDto();
         }
 

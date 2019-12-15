@@ -128,8 +128,9 @@ namespace BD2.Controllers
             }
 
             _context.Groups.Remove(@group);
+            _context.ItemGroups.RemoveRange(
+                _context.ItemGroups.Where(ig => ig.Group == group));
             await _context.SaveChangesAsync();
-
             return @group.GetDto();
         }
 

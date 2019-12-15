@@ -109,8 +109,9 @@ namespace BD2.Controllers
             }
 
             _context.LocalItems.Remove(localItem);
+            _context.Values.RemoveRange(
+                _context.Values.Where(v => v.LocalItem == localItem));
             await _context.SaveChangesAsync();
-
             return localItem.GetDto();
         }
 

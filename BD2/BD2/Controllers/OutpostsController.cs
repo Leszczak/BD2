@@ -104,8 +104,11 @@ namespace BD2.Controllers
             }
 
             _context.Outposts.Remove(outpost);
+            foreach (User u in _context.Users.Where(u => u.Outpost == outpost))
+                u.Outpost = null;
+            foreach (LocalItem li in _context.LocalItems.Where(li=> li.Outpost == outpost))
+                li.Outpost = null;
             await _context.SaveChangesAsync();
-
             return outpost.GetDto();
         }
 

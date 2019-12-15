@@ -130,9 +130,11 @@ namespace BD2.Controllers
             }
 
             _context.GlobalAtributes.Remove(globalAtribute);
+            _context.ItemGlobalAtributes.RemoveRange(
+                _context.ItemGlobalAtributes.Where(iga => iga.GlobalAtribute == globalAtribute));
             await _context.SaveChangesAsync();
 
-            return globalAtribute.GetDto();
+            return globalAtribute.GetDto(); 
         }
 
         private bool GlobalAtributeExists(long id)
