@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script src="JS/requests.js"></script>
+    <script src="JS/table.js"></script>
+</head>
+<body>
+    <h1>Main</h1>
+    <!--<a href="user.html">Users</a><br>
+    <a href="item.html">Items</a><br>
+    <a href="outpost.html">Outposts</a><br>
+    <a href="group.html">Outposts</a><br>-->
+    
+    <select id="select" onchange="selectChange(this.value)">    
+        <option value=null>select</option>
+        <option value="users">users</option>
+        <option value="items">items</option>
+        <option value="outposts">outposts</option>
+        <option value="groups">groups</option>
+    </select>
+
+    <table id="table" border="1"></table>
+
+    <a href="test.html">Test</a><br>
+
+    <script>
+        async function selectChange(select) {
+            let data = await requestGet(select);
+            showTable(data, select.substring(0, select.length - 1));
+        }
+        
+    </script>
+
+</body>
+</html>
