@@ -58,6 +58,10 @@ namespace BD2
             {
                 endpoints.MapControllers();
             });
+
+            app.UseDefaultFiles();
+
+            app.UseStaticFiles();
         }
     }
 }
