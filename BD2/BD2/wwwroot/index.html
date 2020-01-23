@@ -11,18 +11,11 @@
 </head>
 <body>
     <h1>Main</h1>
-    <!--<a href="user.html">Users</a><br>
-    <a href="item.html">Items</a><br>
-    <a href="outpost.html">Outposts</a><br>
-    <a href="group.html">Outposts</a><br>-->
-    
-    <select id="select" onchange="selectChange(this.value)">    
-        <option value=null>select</option>
-        <option value="users">users</option>
-        <option value="items">items</option>
-        <option value="outposts">outposts</option>
-        <option value="groups">groups</option>
-    </select>
+
+    <button id="users" value="users" onclick="selectChange(this.value)">users</button>
+    <button id="items" value="items" onclick="selectChange(this.value)">items</button>
+    <button id="outposts" value="outposts" onclick="selectChange(this.value)">outposts</button>
+    <button id="groups" value="groups" onclick="selectChange(this.value)">users</button>
 
     <table id="table" border="1"></table>
 
