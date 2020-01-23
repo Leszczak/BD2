@@ -12,19 +12,24 @@
 <body>
     <h1>Main</h1>
 
-    <button id="users" value="users" onclick="selectChange(this.value)">users</button>
-    <button id="items" value="items" onclick="selectChange(this.value)">items</button>
-    <button id="outposts" value="outposts" onclick="selectChange(this.value)">outposts</button>
-    <button id="groups" value="groups" onclick="selectChange(this.value)">users</button>
+    <button id="users" value="users" onclick="showSelectedTable(this.value)">users</button>
+    <button id="items" value="items" onclick="showSelectedTable(this.value)">items</button>
+    <button id="outposts" value="outposts" onclick="showSelectedTable(this.value)">outposts</button>
+    <button id="groups" value="groups" onclick="showSelectedTable(this.value)">groups</button>
 
     <table id="table" border="1"></table>
 
     <a href="test.html">Test</a><br>
 
     <script>
-        async function selectChange(select) {
-            let data = await requestGet(select);
-            showTable(data, select.substring(0, select.length - 1));
+        async function showSelectedTable(select) {
+            try {  
+                let data = await requestGet(select);
+                showTable(data, select.substring(0, select.length - 1));
+            } catch(err) {
+                showTable(null, null);
+                console.log(err);
+            }
         }
         
     </script>

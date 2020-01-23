@@ -1,25 +1,29 @@
 function showTable(dataJSON, entityName) {
     let htmltxt = '<tr>';
 
-    for (atr in dataJSON[0]) {
-        if (!isForeignId(atr))
-            htmltxt += '<th>' + atr + '</th>';
-    }
-    
-    htmltxt += '<th>more</th></tr>';
-
-    dataJSON.forEach(object => {
-        htmltxt += '<tr>';
-
-        for (atr in object) {
+    if (Array.isArray(dataJSON) && dataJSON.length) {
+        for (atr in dataJSON[0]) {
             if (!isForeignId(atr))
-                htmltxt += '<th>' + object[atr] + '</th>';
+                htmltxt += '<th>' + atr + '</th>';
         }
         
-        htmltxt += `<th><a href="${entityName}.html?id=${object['id']}">more...</a></th>`;
-        
-        htmltxt += '</tr>';
-    });
+        htmltxt += '<th>more</th></tr>';
+    
+        dataJSON.forEach(object => {
+            htmltxt += '<tr>';
+    
+            for (atr in object) {
+                if (!isForeignId(atr))
+                    htmltxt += '<th>' + object[atr] + '</th>';
+            }
+            
+            htmltxt += `<th><a href="${entityName}.html?id=${object['id']}">more...</a></th>`;
+            
+            htmltxt += '</tr>';
+        });    
+    } else {
+        htmltxt = '<th>empty</th></tr>';
+    }
 
     document.getElementById('table').innerHTML = htmltxt;
 }
