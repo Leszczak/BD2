@@ -28,13 +28,12 @@ function generateTableWithLinks(dataJSON, entityName) {
     return htmltxt
 }
 
-function generateTable(dataJSON) {
+function generateTableWithButtons(dataJSON) {
     let htmltxt = '<tr>';
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
         for (atr in dataJSON[0]) {
-            //if (!isForeignId(atr))
-                htmltxt += '<th>' + atr + '</th>';
+            htmltxt += '<th>' + atr + '</th>';
         }
     
         dataJSON.forEach(object => {
@@ -42,9 +41,34 @@ function generateTable(dataJSON) {
     
             for (atr in object) {
                 if (isForeignId(atr)) {
-                    htmltxt += `<th><button name="${atr}" value="${object[atr]}" 
+                    htmltxt += `<th><button name="${sliceId(atr)}" value="${object[atr]}" 
                     onclick="buttonClicked(this.name, this.value)">show</button></th>`;
                 } else
+                    htmltxt += '<th>' + object[atr] + '</th>';
+            }
+            
+            htmltxt += '</tr>';
+        });    
+    } else {
+        htmltxt = '<th>empty</th></tr>';
+    }
+
+    return htmltxt
+}
+
+function generateTable(dataJSON) {
+    let htmltxt = '<tr>';
+    if (Array.isArray(dataJSON) && dataJSON.length) {
+        for (atr in dataJSON[0]) {
+            if (!isForeignId(atr))
+                htmltxt += '<th>' + atr + '</th>';
+        }
+    
+        dataJSON.forEach(object => {
+            htmltxt += '<tr>';
+    
+            for (atr in object) {
+                if (!isForeignId(atr))
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
             
@@ -63,4 +87,8 @@ function isId(atr) {
 
 function isForeignId(atr) {
     return isId(atr) && atr.length > 2;
+}
+
+function sliceId(foreignId) {
+    return foreignId.slice(0, foreignId.lastIndexOf('Id'));
 }
