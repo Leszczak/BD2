@@ -33,7 +33,7 @@ function generateTable(dataJSON) {
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
         for (atr in dataJSON[0]) {
-            if (!isForeignId(atr))
+            //if (!isForeignId(atr))
                 htmltxt += '<th>' + atr + '</th>';
         }
     
@@ -41,7 +41,10 @@ function generateTable(dataJSON) {
             htmltxt += '<tr>';
     
             for (atr in object) {
-                if (!isForeignId(atr))
+                if (isForeignId(atr)) {
+                    htmltxt += `<th><button name="${atr}" value="${object[atr]}" 
+                    onclick="buttonClicked(this.name, this.value)">show</button></th>`;
+                } else
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
             

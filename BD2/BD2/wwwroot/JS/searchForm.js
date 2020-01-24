@@ -7,3 +7,8 @@ async function selectChange(select) {
         document.getElementById('table').innerHTML = generateTable(null);
     }
 }
+
+function buttonClicked(atr, id) {
+    console.log(atr);
+    console.log(id);
+}
