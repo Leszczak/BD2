@@ -23,11 +23,11 @@
 
     <script>
         async function showSelectedTable(select) {
-            try {  
+            try {
                 let data = await requestGet(select);
-                document.getElementById('table').innerHTML = generateMainTable(data, select.substring(0, select.length - 1));
+                document.getElementById('table').innerHTML = generateTableWithLinks(data, select.substring(0, select.length - 1));
             } catch(err) {
-                document.getElementById('table').innerHTML = generateMainTable(null, null);
+                document.getElementById('table').innerHTML = generateTable(null);
                 console.log(err);
             }
         }
