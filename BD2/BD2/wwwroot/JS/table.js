@@ -36,8 +36,6 @@ function generateTable(dataJSON) {
             if (!isForeignId(atr))
                 htmltxt += '<th>' + atr + '</th>';
         }
-        
-        htmltxt += '<th>more</th></tr>';
     
         dataJSON.forEach(object => {
             htmltxt += '<tr>';

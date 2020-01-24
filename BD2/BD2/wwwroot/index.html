@@ -5,34 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-
-    <script src="JS/requests.js"></script>
-    <script src="JS/table.js"></script>
 </head>
 <body>
     <h1>Main</h1>
 
-    <button id="users" value="users" onclick="showSelectedTable(this.value)">users</button>
-    <button id="items" value="items" onclick="showSelectedTable(this.value)">items</button>
-    <button id="outposts" value="outposts" onclick="showSelectedTable(this.value)">outposts</button>
-    <button id="groups" value="groups" onclick="showSelectedTable(this.value)">groups</button>
-
-    <table id="table" border="1"></table>
-
+    <a href="searchForm.html">Search</a><br>
     <a href="test.html">Test</a><br>
-
-    <script>
-        async function showSelectedTable(select) {
-            try {
-                let data = await requestGet(select);
-                document.getElementById('table').innerHTML = generateTableWithLinks(data, select.substring(0, select.length - 1));
-            } catch(err) {
-                document.getElementById('table').innerHTML = generateTable(null);
-                console.log(err);
-            }
-        }
-        
-    </script>
-
 </body>
 </html>
