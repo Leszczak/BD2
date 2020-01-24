@@ -1,4 +1,4 @@
-function showTable(dataJSON, entityName) {
+function generateMainTable(dataJSON, entityName) {
     let htmltxt = '<tr>';
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
@@ -25,7 +25,7 @@ function showTable(dataJSON, entityName) {
         htmltxt = '<th>empty</th></tr>';
     }
 
-    document.getElementById('table').innerHTML = htmltxt;
+    return htmltxt
 }
 
 function isId(atr) {

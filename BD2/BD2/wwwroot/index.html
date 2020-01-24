@@ -25,9 +25,9 @@
         async function showSelectedTable(select) {
             try {  
                 let data = await requestGet(select);
-                showTable(data, select.substring(0, select.length - 1));
+                document.getElementById('table').innerHTML = generateMainTable(data, select.substring(0, select.length - 1));
             } catch(err) {
-                showTable(null, null);
+                document.getElementById('table').innerHTML = generateMainTable(null, null);
                 console.log(err);
             }
         }
