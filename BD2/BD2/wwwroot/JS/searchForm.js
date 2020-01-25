@@ -1,3 +1,8 @@
+function onLoad() {
+    document.getElementById('mainTable').innerHTML = generateTable(null);
+    document.getElementById('detailsTable').innerHTML = generateTable(null);
+}
+
 async function selectChange(select) {
     try {
         let data = await requestGet(select);
@@ -5,14 +10,17 @@ async function selectChange(select) {
     } catch(err) {
         console.log(err);
         document.getElementById('mainTable').innerHTML = generateTable(null);
+    } finally {
+        document.getElementById('detailsTable').innerHTML = generateTable(null);
     }
 }
 
 async function buttonClicked(atr, id) {
     console.log(atr);
     console.log(id);
+    let ids = id.split(',');
     try {
-        let data = await requestGet(atr+`s/${id}`);
+        let data = await requestGet(atr+`s/${ids[0]}`);
         if (Array.isArray(data)) {
             document.getElementById('detailsTable').innerHTML = generateTable(data);
         } else {
