@@ -3,10 +3,10 @@ function onLoad() {
     document.getElementById('detailsTable').innerHTML = generateTable(null);
 }
 
-async function selectChange(select) {
+async function updateTables(select) {
     try {
         let data = await requestGet(select);
-        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data);
+        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data, select);
     } catch(err) {
         console.log(err);
         document.getElementById('mainTable').innerHTML = generateTable(null);
@@ -15,7 +15,7 @@ async function selectChange(select) {
     }
 }
 
-async function buttonClicked(atr, id) {
+async function showBtnClicked(atr, id) {
     try {
         console.log(atr);
         console.log(id);
@@ -30,5 +30,14 @@ async function buttonClicked(atr, id) {
     } catch(err) {
         console.log(err);
         document.getElementById('detailsTable').innerHTML = generateTable(null);
+    }
+}
+
+async function deleteBtnClicked(interfaceName, id) {
+    try {
+        await requestDelete(interfaceName, id);
+        await updateTables(interfaceName);
+    } catch(err) {
+        console.log(err);
     }
 }

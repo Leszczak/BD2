@@ -1,4 +1,4 @@
-function generateTableWithLinks(dataJSON, entityName) {
+function generateTableWithLinks(dataJSON, interfaceName) {
     let htmltxt = '<tr>';
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
@@ -17,7 +17,7 @@ function generateTableWithLinks(dataJSON, entityName) {
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
             
-            htmltxt += `<th><a href="${entityName}.html?id=${object['id']}">more...</a></th>`;
+            htmltxt += `<th><a href="${interfaceName}.html?id=${object['id']}">more...</a></th>`;
             
             htmltxt += '</tr>';
         });    
@@ -28,7 +28,7 @@ function generateTableWithLinks(dataJSON, entityName) {
     return htmltxt
 }
 
-function generateTableWithButtons(dataJSON) {
+function generateTableWithButtons(dataJSON, interfaceName) {
     let htmltxt = '<tr>';
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
@@ -38,7 +38,9 @@ function generateTableWithButtons(dataJSON) {
             else
                 htmltxt += '<th>' + atr + '</th>';
         }
-    
+        
+        htmltxt += '<th>delete</th>';
+
         dataJSON.forEach(object => {
             htmltxt += '<tr>';
     
@@ -47,7 +49,7 @@ function generateTableWithButtons(dataJSON) {
                     if (object[atr] != '' && object[atr] != -1) {
                         if (object[atr] != null)
                             htmltxt += `<th><button name="${sliceId(atr)}" value="${object[atr]}" 
-                            onclick="buttonClicked(this.name, this.value)">show</button></th>`;
+                            onclick="showBtnClicked(this.name, this.value)">show</button></th>`;
                         else
                             htmltxt += '<th>null</th>'
                     }
@@ -56,7 +58,8 @@ function generateTableWithButtons(dataJSON) {
                 } else
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
-            
+            htmltxt += `<th><button name="${interfaceName}" value="${object['id']}" 
+                        onclick="deleteBtnClicked(this.name, this.value)">delete</button></th>`;
             htmltxt += '</tr>';
         });    
     } else {
