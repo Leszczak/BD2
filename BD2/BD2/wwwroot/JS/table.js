@@ -33,7 +33,10 @@ function generateTableWithButtons(dataJSON) {
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
         for (atr in dataJSON[0]) {
-            htmltxt += '<th>' + atr + '</th>';
+            if (isForeignId(atr))
+                htmltxt += '<th>' + sliceId(atr) + '</th>'
+            else
+                htmltxt += '<th>' + atr + '</th>';
         }
     
         dataJSON.forEach(object => {
@@ -41,8 +44,15 @@ function generateTableWithButtons(dataJSON) {
     
             for (atr in object) {
                 if (isForeignId(atr)) {
-                    htmltxt += `<th><button name="${sliceId(atr)}" value="${object[atr]}" 
-                    onclick="buttonClicked(this.name, this.value)">show</button></th>`;
+                    if (object[atr] != '' && object[atr] != -1) {
+                        if (object[atr] != null)
+                            htmltxt += `<th><button name="${sliceId(atr)}" value="${object[atr]}" 
+                            onclick="buttonClicked(this.name, this.value)">show</button></th>`;
+                        else
+                            htmltxt += '<th>null</th>'
+                    }
+                    else
+                        htmltxt += '<th>empty</th>'
                 } else
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
