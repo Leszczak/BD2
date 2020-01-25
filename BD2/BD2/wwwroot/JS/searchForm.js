@@ -16,18 +16,17 @@ async function selectChange(select) {
 }
 
 async function buttonClicked(atr, id) {
-    console.log(atr);
-    console.log(id);
-    let ids = id.split(',');
     try {
-        let data = await requestGet(atr+`s/${ids[0]}`);
-        if (Array.isArray(data)) {
-            document.getElementById('detailsTable').innerHTML = generateTable(data);
-        } else {
-            let dataArr = [];
+        console.log(atr);
+        console.log(id);
+        if (id == '') throw Error('empty id');
+        let ids = id.split(',');
+        let dataArr = [];
+        for (element in ids) {
+            let data = await requestGet(atr+`s/${ids[element]}`);
             dataArr.push(data);
-            document.getElementById('detailsTable').innerHTML = generateTable(dataArr);
         }
+        document.getElementById('detailsTable').innerHTML = generateTable(dataArr);
     } catch(err) {
         console.log(err);
         document.getElementById('detailsTable').innerHTML = generateTable(null);
