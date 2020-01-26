@@ -18,7 +18,6 @@ async function requestPost(interfaceName, data) {
         body: JSON.stringify(data)});
     if (!response.ok)
         throw Error(response.statusText);
-    return data;
 }
 
 async function requestPut(interfaceName, id, data) {
@@ -30,7 +29,6 @@ async function requestPut(interfaceName, id, data) {
         body: JSON.stringify(data)});
     if (!response.ok)
         throw Error(response.statusText);
-    return data;
 }
 
 async function requestDelete(interfaceName, id) {
@@ -39,5 +37,4 @@ async function requestDelete(interfaceName, id) {
     const response = await fetch(url, {method: 'DELETE'});
     if (!response.ok)
         throw Error(response.statusText);
-    return data;
 }

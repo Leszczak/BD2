@@ -35,8 +35,8 @@ async function showBtnClicked(atr, id) {
 }
 
 async function postBtnClicked(interfaceName) {
-    let data = dataForms[interfaceName];
-
+    var data = dataForms[interfaceName];
+    console.log(1, data);
     for (atr in data) {
         if (Array.isArray(data[atr])) {
             let input = document.getElementById(atr).value.split(',');
@@ -44,13 +44,15 @@ async function postBtnClicked(interfaceName) {
                 data[atr].push(parseInt(input[element]));
             }
         } else {
-            data[atr] = document.getElementById(atr).value;
+            if (typeof data[atr] == 'string')
+                data[atr] = document.getElementById(atr).value;
+            else
+                data[atr] = parseInt(document.getElementById(atr).value);
         }
     }
-
+    console.log(2, data);
     try {
         await requestPost(interfaceName, data);
-        await updateTables(interfaceName);
     } catch(err) {
         console.log(err);
     } finally {
@@ -70,14 +72,16 @@ async function putBtnClicked(interfaceName, id) {
                     data[atr].push(parseInt(input[element]));
                 }
             } else {
-                data[atr] = document.getElementById(atr).value;
+                if (typeof data[atr] == 'string')
+                    data[atr] = document.getElementById(atr).value;
+                else
+                    data[atr] = parseInt(document.getElementById(atr).value);
             }
         }
     }
 
     try {
         await requestPut(interfaceName, id, data);
-        await updateTables(interfaceName);
     } catch(err) {
         console.log(err);
     } finally {
