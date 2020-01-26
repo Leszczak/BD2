@@ -17,7 +17,7 @@ dataForms = {
     },
     "comments": {
         "title": "",
-        "text": null,
+        "text": "",
         "photoId": -1,
         "itemId": -1,
         "userId": -1
