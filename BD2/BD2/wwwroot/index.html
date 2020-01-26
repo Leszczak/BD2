@@ -5,11 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-</head>
-<body>
-    <h1>Main</h1>
 
-    <a href="searchForm.html">Search</a><br>
-    <a href="test.html">Test</a><br>
+    <script src="JS/requests.js"></script>
+    <script src="JS/table.js"></script>
+    <script src="JS/index.js"></script>
+</head>
+<body onload="onLoad()">
+    <select id="selectObject" onchange="updateTables(this.value)">    
+        <option value=null>select object</option>
+        <option value="users">users</option>
+        <option value="items">items</option>
+        <option value="outposts">outposts</option>
+        <option value="photos">photos</option>
+        <option value="groups">groups</option>
+        <option value="atributes">atributes</option>
+        <option value="globalatributes">globalAtributes</option>
+        <option value="localItems">localItems</option>
+        <option value="authorizations">authorizations</option>
+        <option value="values">values</option>
+        <option value="comments">comments</option>
+    </select>
+
+    <select id="selectAttribute">
+    </select>
+
+    <input type="text" id="textInput"><br><br>
+
+    <table id="mainTable" border="1"></table><br>
+    <table id="detailsTable" border="1"></table><br>
 </body>
 </html>
