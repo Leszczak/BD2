@@ -57,6 +57,12 @@ async function postBtnClicked(interfaceName) {
         } else {
             if (typeof data[atr] == 'string')
                 data[atr] = document.getElementById(atr).value;
+            else if (typeof data[atr] == 'boolean') {
+                if (document.getElementById(atr).value == 'true')
+                    data[atr] = true;
+                else
+                    data[atr] = false;
+            }
             else
                 data[atr] = parseInt(document.getElementById(atr).value);
         }
@@ -85,6 +91,12 @@ async function putBtnClicked(interfaceName, id) {
             } else {
                 if (typeof data[atr] == 'string')
                     data[atr] = document.getElementById(atr).value;
+                else if (typeof data[atr] == 'boolean') {
+                    if (document.getElementById(atr).value == 'true')
+                        data[atr] = true;
+                    else
+                        data[atr] = false;
+                }
                 else
                     data[atr] = parseInt(document.getElementById(atr).value);
             }
