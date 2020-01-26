@@ -94,6 +94,28 @@ function generateTable(dataJSON) {
     return htmltxt
 }
 
+function generateInputTable(json, interfaceName) {
+    let htmltxt = '<tr>';
+    console.log(json);
+    if (json != null) {
+        for (atr in json)
+            htmltxt += '<th>' + atr + '</th>';
+
+        htmltxt += '<tr>';
+        
+        for (atr in json)
+            htmltxt += `<th><input type="text" id="${atr}"></th>`;
+
+        htmltxt += `<th><button name="${interfaceName}" onclick="postBtnClicked(this.name)">POST</button></th>`;
+
+        htmltxt += '</tr>';
+    } else {
+        htmltxt = '<th>empty</th></tr>';
+    }
+
+    return htmltxt
+}
+
 function isId(atr) {
     return atr.toLowerCase().endsWith('id') || atr.toLowerCase().endsWith('ids')
 }

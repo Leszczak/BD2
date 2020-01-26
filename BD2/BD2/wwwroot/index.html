@@ -8,9 +8,11 @@
 
     <script src="JS/requests.js"></script>
     <script src="JS/table.js"></script>
+    <script src="JS/inputData.js"></script>
     <script src="JS/index.js"></script>
 </head>
 <body onload="onLoad()">
+    <h3>Object selection</h3>
     <select id="selectObject" onchange="updateTables(this.value)">    
         <option value=null>select object</option>
         <option value="users">users</option>
@@ -26,12 +28,12 @@
         <option value="comments">comments</option>
     </select>
 
-    <select id="selectAttribute">
-    </select>
-
-    <input type="text" id="textInput"><br><br>
-
+    <br><br>
+    <h3>Input Data</h3>
+    <table id="inputTable" border="1"></table><br>
+    <h3>Main Table</h3>
     <table id="mainTable" border="1"></table><br>
-    <table id="detailsTable" border="1"></table><br>
+    <h3>Related Table</h3>
+    <table id="relatedTable" border="1"></table><br>
 </body>
 </html>
