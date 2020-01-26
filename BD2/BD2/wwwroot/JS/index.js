@@ -58,16 +58,19 @@ async function postBtnClicked(interfaceName) {
 }
 
 async function putBtnClicked(interfaceName, id) {
-    let data = dataForms[interfaceName];
-
+    let data = Object.create(dataForms[interfaceName]);
+    data['id'] = parseInt(id);
+    
     for (atr in data) {
-        if (Array.isArray(data[atr])) {
-            let input = document.getElementById(atr).value.split(',');
-            for (element in input) {
-                data[atr].push(parseInt(input[element]));
+        if (atr != 'id') {
+            if (Array.isArray(data[atr])) {
+                let input = document.getElementById(atr).value.split(',');
+                for (element in input) {
+                    data[atr].push(parseInt(input[element]));
+                }
+            } else {
+                data[atr] = document.getElementById(atr).value;
             }
-        } else {
-            data[atr] = document.getElementById(atr).value;
         }
     }
 

@@ -21,8 +21,8 @@ async function requestPost(interfaceName, data) {
     return data;
 }
 
-async function requestPost(interfaceName, id, data) {
-    console.log(`requestPost(${interfaceName}, ${id}, ${JSON.stringify(data)})`);
+async function requestPut(interfaceName, id, data) {
+    console.log(`requestPut(${interfaceName}, ${id}, ${JSON.stringify(data)})`);
     const url = `https://localhost:5001/api/${interfaceName}/${id}`;
     const response = await fetch(url, {
         method: 'PUT',
