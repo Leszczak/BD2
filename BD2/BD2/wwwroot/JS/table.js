@@ -3,8 +3,10 @@ function generateTableWithButtons(dataJSON, interfaceName) {
 
     if (Array.isArray(dataJSON) && dataJSON.length) {
         for (atr in dataJSON[0]) {
-            if (isForeignId(atr))
-                htmltxt += '<th>' + sliceId(atr) + '</th>'
+            if (isForeignId(atr) && atr.toLowerCase().endsWith('s'))
+                htmltxt += '<th>' + sliceId(atr) + 's</th>'
+            else if (isForeignId(atr))
+                htmltxt += '<th>' + sliceId(atr) + '</th>';
             else
                 htmltxt += '<th>' + atr + '</th>';
         }
