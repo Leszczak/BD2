@@ -47,7 +47,7 @@ function generateTableWithButtons(dataJSON, interfaceName) {
                     if (object[atr] != '' && object[atr] != -1) {
                         if (object[atr] != null)
                             htmltxt += `<th><button name="${sliceId(atr)}" value="${object[atr]}" 
-                            onclick="showBtnClicked(this.name, this.value)">show</button></th>`;
+                            onclick="showBtnClicked(this.name, this.value)">show table</button></th>`;
                         else
                             htmltxt += '<th>null</th>'
                     }
@@ -73,7 +73,7 @@ function generateTable(dataJSON) {
     let htmltxt = '<tr>';
     if (Array.isArray(dataJSON) && dataJSON.length) {
         for (atr in dataJSON[0]) {
-            if (!isForeignId(atr))
+            //if (!isForeignId(atr))
                 htmltxt += '<th>' + atr + '</th>';
         }
     
@@ -81,7 +81,7 @@ function generateTable(dataJSON) {
             htmltxt += '<tr>';
     
             for (atr in object) {
-                if (!isForeignId(atr))
+                //if (!isForeignId(atr))
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
             
