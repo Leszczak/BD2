@@ -19,8 +19,6 @@ async function updateTables(select) {
 
 async function showBtnClicked(atr, id) {
     try {
-        console.log(atr);
-        console.log(id);
         if (id == '') throw Error('empty id');
         let ids = id.split(',');
         let dataArr = [];
@@ -41,7 +39,6 @@ async function postBtnClicked(interfaceName) {
     for (atr in data) {
         if (Array.isArray(data[atr])) {
             let input = document.getElementById(atr).value.split(',');
-            console.log(input);
             for (element in input) {
                 data[atr].push(parseInt(input[element]));
             }
@@ -51,8 +48,6 @@ async function postBtnClicked(interfaceName) {
     }
 
     try {
-        console.log(interfaceName);
-        console.log(data);
         await requestPost(interfaceName, data);
         await updateTables(interfaceName);
     } catch(err) {
@@ -63,7 +58,27 @@ async function postBtnClicked(interfaceName) {
 }
 
 async function putBtnClicked(interfaceName, id) {
-    
+    let data = dataForms[interfaceName];
+
+    for (atr in data) {
+        if (Array.isArray(data[atr])) {
+            let input = document.getElementById(atr).value.split(',');
+            for (element in input) {
+                data[atr].push(parseInt(input[element]));
+            }
+        } else {
+            data[atr] = document.getElementById(atr).value;
+        }
+    }
+
+    try {
+        await requestPut(interfaceName, id, data);
+        await updateTables(interfaceName);
+    } catch(err) {
+        console.log(err);
+    } finally {
+        await updateTables(interfaceName);
+    }
 }
 
 async function deleteBtnClicked(interfaceName, id) {

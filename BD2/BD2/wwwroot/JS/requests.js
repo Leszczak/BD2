@@ -21,6 +21,18 @@ async function requestPost(interfaceName, data) {
     return data;
 }
 
+async function requestPost(interfaceName, id, data) {
+    console.log(`requestPost(${interfaceName}, ${id}, ${JSON.stringify(data)})`);
+    const url = `https://localhost:5001/api/${interfaceName}/${id}`;
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)});
+    if (!response.ok)
+        throw Error(response.statusText);
+    return data;
+}
+
 async function requestDelete(interfaceName, id) {
     console.log(`requestDelete(${interfaceName}, ${id})`);
     const url = `https://localhost:5001/api/${interfaceName}/${id}`;

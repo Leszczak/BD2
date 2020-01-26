@@ -96,7 +96,6 @@ function generateTable(dataJSON) {
 
 function generateInputTable(json, interfaceName) {
     let htmltxt = '<tr>';
-    console.log(json);
     if (json != null) {
         for (atr in json)
             htmltxt += '<th>' + atr + '</th>';
