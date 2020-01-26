@@ -13,7 +13,7 @@ dataForms = {
     "authorizations": {
         "name": "",
         "canEdit": false,
-        "isGlobal": true
+        "isGlobal": false
     },
     "comments": {
         "title": "",
@@ -41,7 +41,8 @@ dataForms = {
         "groupIds": []
     },
     "localItems": {
-
+        "itemId": -1,
+        "outpostId": -1
     },
     "outposts": {
         "name": "",
@@ -51,6 +52,8 @@ dataForms = {
         "comment": ""
     },
     "values": {
-
+        "content": "",
+        "atributeId": -1,
+        "localItemId": -1
     }
 }
