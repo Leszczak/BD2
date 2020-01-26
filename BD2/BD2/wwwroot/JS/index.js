@@ -2,7 +2,6 @@ function onLoad() {
     document.getElementById('inputTable').innerHTML = generateInputTable(null);
     document.getElementById('mainTable').innerHTML = generateTable(null);
     document.getElementById('relatedTable').innerHTML = generateTable(null);
-    console.log(dataForms);
 }
 
 async function updateTables(select) {
@@ -38,11 +37,14 @@ async function showBtnClicked(atr, id) {
 
 async function postBtnClicked(interfaceName) {
     let data = dataForms[interfaceName];
+
     for (atr in data) {
         data[atr] = document.getElementById(atr).value;
     }
 
     try {
+        console.log(interfaceName);
+        console.log(data);
         await requestPost(interfaceName, data);
         await updateTables(interfaceName);
     } catch(err) {

@@ -10,9 +10,12 @@ async function requestGet(interfaceName) {
 }
 
 async function requestPost(interfaceName, data) {
-    console.log(`requestPost(${interfaceName})`);
+    console.log(`requestPost(${interfaceName}, ${JSON.stringify(data)})`);
     const url = `https://localhost:5001/api/${interfaceName}`;
-    const response = await fetch(url, {method: 'POST'});
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)});
     if (!response.ok)
         throw Error(response.statusText);
     return data;
