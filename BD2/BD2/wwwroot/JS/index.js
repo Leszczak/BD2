@@ -12,6 +12,7 @@ async function updateTables(select) {
     } catch(err) {
         console.log(err);
         document.getElementById('mainTable').innerHTML = generateTable(null);
+        document.getElementById('inputTable').innerHTML = generateInputTable(null);
     } finally {
         document.getElementById('relatedTable').innerHTML = generateTable(null);
     }
