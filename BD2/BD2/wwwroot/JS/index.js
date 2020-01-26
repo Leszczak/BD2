@@ -39,7 +39,15 @@ async function postBtnClicked(interfaceName) {
     let data = dataForms[interfaceName];
 
     for (atr in data) {
-        data[atr] = document.getElementById(atr).value;
+        if (Array.isArray(data[atr])) {
+            let input = document.getElementById(atr).value.split(',');
+            console.log(input);
+            for (element in input) {
+                data[atr].push(parseInt(input[element]));
+            }
+        } else {
+            data[atr] = document.getElementById(atr).value;
+        }
     }
 
     try {
@@ -49,14 +57,21 @@ async function postBtnClicked(interfaceName) {
         await updateTables(interfaceName);
     } catch(err) {
         console.log(err);
+    } finally {
+        await updateTables(interfaceName);
     }
+}
+
+async function putBtnClicked(interfaceName, id) {
+    
 }
 
 async function deleteBtnClicked(interfaceName, id) {
     try {
         await requestDelete(interfaceName, id);
-        await updateTables(interfaceName);
     } catch(err) {
         console.log(err);
+    } finally {
+        await updateTables(interfaceName);
     }
 }

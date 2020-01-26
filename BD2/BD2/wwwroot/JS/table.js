@@ -38,8 +38,6 @@ function generateTableWithButtons(dataJSON, interfaceName) {
             else
                 htmltxt += '<th>' + atr + '</th>';
         }
-        
-        htmltxt += '<th>delete</th>';
 
         dataJSON.forEach(object => {
             htmltxt += '<tr>';
@@ -59,7 +57,9 @@ function generateTableWithButtons(dataJSON, interfaceName) {
                     htmltxt += '<th>' + object[atr] + '</th>';
             }
             htmltxt += `<th><button name="${interfaceName}" value="${object['id']}" 
-                        onclick="deleteBtnClicked(this.name, this.value)">delete</button></th>`;
+            onclick="putBtnClicked(this.name, this.value)">PUT</button></th>`;
+            htmltxt += `<th><button name="${interfaceName}" value="${object['id']}" 
+                        onclick="deleteBtnClicked(this.name, this.value)">DELETE</button></th>`;
             htmltxt += '</tr>';
         });    
     } else {
