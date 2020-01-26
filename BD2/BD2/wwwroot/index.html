@@ -9,6 +9,7 @@
     <script src="JS/requests.js"></script>
     <script src="JS/table.js"></script>
     <script src="JS/inputData.js"></script>
+    <script src="JS/csvGenerator.js"></script>
     <script src="JS/index.js"></script>
 </head>
 <body onload="onLoad()">
@@ -27,7 +28,7 @@
         <option value="values">values</option>
         <option value="comments">comments</option>
     </select>
-
+    <button id="downloadBtn" onclick="downloadCSV(selectObject.value)">Download CSV</button>
     <br><br>
     <h3>Input Data</h3>
     <table id="inputTable" border="1"></table><br>

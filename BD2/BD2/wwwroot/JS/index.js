@@ -18,6 +18,17 @@ async function updateTables(select) {
     }
 }
 
+function downloadCSV(interfaceName) {
+    let text;
+    requestGet(interfaceName).then((data) => {
+        text = generateCSV(data);
+        element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', interfaceName + '.csv');
+        element.click();
+    });
+}
+
 async function showBtnClicked(atr, id) {
     try {
         if (id == '') throw Error('empty id');
