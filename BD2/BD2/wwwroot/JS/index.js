@@ -10,7 +10,7 @@ async function updateTables(select) {
         let data = await requestGet(select);
         let selectedAtr = document.getElementById('selectAtr').value;
         document.getElementById('inputTable').innerHTML = generateInputTable(dataForms[select], select);
-        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data.filter(filter, selectedAtr), select);
+        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data.filter(atrFilter, selectedAtr), select);
     } catch(err) {
         console.log(err);
         document.getElementById('selectAtr').innerHTML = generateSelectAtr(null);
@@ -31,8 +31,9 @@ async function mainSelectChange(select) {
 
 function downloadCSV(interfaceName) {
     let text;
+    let selectedAtr = document.getElementById('selectAtr').value;
     requestGet(interfaceName).then((data) => {
-        text = generateCSV(data);
+        text = generateCSV(data.filter(atrFilter, selectedAtr));
         element = document.createElement('a');
         element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
         element.setAttribute('download', interfaceName + '.csv');
@@ -144,7 +145,7 @@ function generateSelectAtr(data) {
     return htmltxt;
 }
 
-function filter(object) {
+function atrFilter(object) {
     if (this == '') return true;
     let inputText = document.getElementById('inputText').value;
     if (typeof object[this] == 'string') 
