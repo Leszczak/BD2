@@ -2,20 +2,29 @@ function onLoad() {
     document.getElementById('inputTable').innerHTML = generateInputTable(null);
     document.getElementById('mainTable').innerHTML = generateTable(null);
     document.getElementById('relatedTable').innerHTML = generateTable(null);
+    document.getElementById('selectAtr').innerHTML = generateSelectAtr(null);
 }
 
 async function updateTables(select) {
     try {
         let data = await requestGet(select);
-        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data, select);
+        let selectedAtr = document.getElementById('selectAtr').value;
         document.getElementById('inputTable').innerHTML = generateInputTable(dataForms[select], select);
+        document.getElementById('mainTable').innerHTML = generateTableWithButtons(data.filter(filter, selectedAtr), select);
     } catch(err) {
         console.log(err);
-        document.getElementById('mainTable').innerHTML = generateTable(null);
+        document.getElementById('selectAtr').innerHTML = generateSelectAtr(null);
         document.getElementById('inputTable').innerHTML = generateInputTable(null);
+        document.getElementById('mainTable').innerHTML = generateTable(null);
     } finally {
         document.getElementById('relatedTable').innerHTML = generateTable(null);
     }
+}
+
+async function mainSelectChange(select) {
+    document.getElementById('selectAtr').innerHTML = generateSelectAtr(dataForms[select]);
+    document.getElementById('inputTable').innerHTML = generateInputTable(dataForms[select], select);
+
 }
 
 function downloadCSV(interfaceName) {
@@ -119,5 +128,39 @@ async function deleteBtnClicked(interfaceName, id) {
         console.log(err);
     } finally {
         await updateTables(interfaceName);
+    }
+}
+
+function generateSelectAtr(data) {
+    let htmltxt = '<option value=""></option>';
+    if (data != null) {
+        htmltxt += `<option value="id">id</option>`;
+        for (atr in data)
+            htmltxt += `<option value="${atr}">${atr}</option>`;
+    }
+    
+    return htmltxt;
+}
+
+function filter(object) {
+    if (this == '') return true;
+    let inputText = document.getElementById('inputText').value;
+    if (typeof object[this] == 'string') 
+        return object[this].startsWith(inputText);
+    else if (typeof object[this] == 'boolean') {
+        if (inputText == 'true' && object[this] || inputText == 'false' && !object[this])
+            return true;
+        else
+            return false;
+    } else if (Array.isArray(object[this])) {
+        arr = JSON.parse('[' + inputText + ']');
+        let t = true;
+        arr.forEach((element) => {
+            if (!object[this].includes(element))
+                t = false;
+        })
+        return t;
+    } else {
+        return object[this] == parseInt(inputText);
     }
 }

@@ -14,7 +14,7 @@
 </head>
 <body onload="onLoad()">
     <h3>Object selection</h3>
-    <select id="selectObject" onchange="updateTables(this.value)">    
+    <select id="selectObject" onchange="mainSelectChange(this.value)">    
         <option value=null>select object</option>
         <option value="users">users</option>
         <option value="items">items</option>
@@ -28,6 +28,9 @@
         <option value="values">values</option>
         <option value="comments">comments</option>
     </select>
+    <select id="selectAtr"></select>
+    <input type="text" id="inputText">
+    <button id="updateBtn" onclick="updateTables(selectObject.value)">Show table</button>
     <button id="downloadBtn" onclick="downloadCSV(selectObject.value)">Download CSV</button>
     <br><br>
     <h3>Input Data</h3>
