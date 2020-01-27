@@ -58,8 +58,12 @@ async function showBtnClicked(atr, id) {
 }
 
 async function postBtnClicked(interfaceName) {
-    var data = dataForms[interfaceName];
-    console.log(1, data);
+    let data = Object.create(dataForms[interfaceName]);
+    for (atr in dataForms[interfaceName]) {
+        if (Array.isArray(dataForms[interfaceName]))
+        data[atr] = dataForms[interfaceName][atr].slice();
+        data[atr] = dataForms[interfaceName][atr];
+    }
     for (atr in data) {
         if (Array.isArray(data[atr])) {
             let input = document.getElementById(atr).value.split(',');
@@ -79,7 +83,6 @@ async function postBtnClicked(interfaceName) {
                 data[atr] = parseInt(document.getElementById(atr).value);
         }
     }
-    console.log(2, data);
     try {
         await requestPost(interfaceName, data);
     } catch(err) {
@@ -91,8 +94,13 @@ async function postBtnClicked(interfaceName) {
 
 async function putBtnClicked(interfaceName, id) {
     let data = Object.create(dataForms[interfaceName]);
+    for (atr in dataForms[interfaceName]) {
+        if (Array.isArray(dataForms[interfaceName]))
+        data[atr] = dataForms[interfaceName][atr].slice();
+        data[atr] = dataForms[interfaceName][atr];
+    }
     data['id'] = parseInt(id);
-    
+    console.log(1, data);
     for (atr in data) {
         if (atr != 'id') {
             if (Array.isArray(data[atr])) {
@@ -114,7 +122,7 @@ async function putBtnClicked(interfaceName, id) {
             }
         }
     }
-
+    console.log(2, data);
     try {
         await requestPut(interfaceName, id, data);
     } catch(err) {
@@ -122,6 +130,15 @@ async function putBtnClicked(interfaceName, id) {
     } finally {
         await updateTables(interfaceName);
     }
+}
+
+function copy(object) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
 }
 
 async function deleteBtnClicked(interfaceName, id) {

@@ -68,12 +68,14 @@ function generateInputTable(json, interfaceName) {
     let htmltxt = '<tr>';
     if (json != null) {
         for (atr in json)
-            htmltxt += '<th>' + atr + '</th>';
+            if (atr != 'id')
+                htmltxt += '<th>' + atr + '</th>';
 
         htmltxt += '<tr>';
         
         for (atr in json)
-            htmltxt += `<th><input type="text" id="${atr}"></th>`;
+            if (atr != 'id')
+                htmltxt += `<th><input type="text" id="${atr}"></th>`;
 
         htmltxt += `<th><button name="${interfaceName}" onclick="postBtnClicked(this.name)">POST</button></th>`;
 
