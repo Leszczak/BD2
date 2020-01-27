@@ -61,8 +61,9 @@ async function postBtnClicked(interfaceName) {
     let data = Object.create(dataForms[interfaceName]);
     for (atr in dataForms[interfaceName]) {
         if (Array.isArray(dataForms[interfaceName]))
-        data[atr] = dataForms[interfaceName][atr].slice();
-        data[atr] = dataForms[interfaceName][atr];
+            data[atr] = [];
+        else
+            data[atr] = dataForms[interfaceName][atr];
     }
     for (atr in data) {
         if (Array.isArray(data[atr])) {
@@ -96,8 +97,9 @@ async function putBtnClicked(interfaceName, id) {
     let data = Object.create(dataForms[interfaceName]);
     for (atr in dataForms[interfaceName]) {
         if (Array.isArray(dataForms[interfaceName]))
-        data[atr] = dataForms[interfaceName][atr].slice();
-        data[atr] = dataForms[interfaceName][atr];
+            data[atr] = [];
+        else
+            data[atr] = dataForms[interfaceName][atr];
     }
     data['id'] = parseInt(id);
     console.log(1, data);
