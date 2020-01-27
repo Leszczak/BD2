@@ -23,8 +23,10 @@ async function updateTables(select) {
 
 async function mainSelectChange(select) {
     document.getElementById('selectAtr').innerHTML = generateSelectAtr(dataForms[select]);
+    document.getElementById('inputText').value = '';
     document.getElementById('inputTable').innerHTML = generateInputTable(dataForms[select], select);
-
+    document.getElementById('mainTable').innerHTML = generateTable(null);
+    document.getElementById('relatedTable').innerHTML = generateTable(null);
 }
 
 function downloadCSV(interfaceName) {
